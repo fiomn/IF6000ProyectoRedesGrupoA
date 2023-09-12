@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css?family=Raleway');
+
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+    background: linear-gradient(white, #64DAC1 );
+}
+
+#config {
+    margin-left: 65em;
+}
+
+.modal-content {
+    background-color: #DFEAE8;
+}
+
+
+.modal-title {
+    font-style: oblique;
+}
+
+#navB {
+    background-color: #8D9392;
+    border-radius: 20px;
+}
+
+
+a, header, body, thead, tbody, h1, h2, h3, h4, h5, h6 {
+    font-family: 'Raleway';
+    color: black;
+}
+
+.card-body {
+    text-align: center;
+}
+
+.btn-player {
+    color: black;
+    background-color: transparent;
+    border-color: #39A48E;
+    border-radius: 15px;
+    width: 20px;
+}
+
+.btn-icon {
+    color: black;
+    background-color: white;
+    border-color: black;
+    border-radius: 9px;
+}
+@import url('https://fonts.googleapis.com/css?family=Raleway');
+
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+    background: linear-gradient(white, #64DAC1 );
+}
+
+#config {
+    margin-left: 65em;
+}
+
+.modal-content {
+    background-color: #DFEAE8;
+}
+
+
+.modal-title {
+    font-style: oblique;
+}
+
+#navB {
+    background-color: #8D9392;
+    border-radius: 20px;
+}
+
+
+a, header, body, thead, tbody, h1, h2, h3, h4, h5, h6 {
+    font-family: 'Raleway';
+    color: black;
+}
+
+.card-body {
+    text-align: center;
+}
+
+.btn-player {
+    color: black;
+    background-color: transparent;
+    border-color: #39A48E;
+    border-radius: 15px;
+    width: 20px;
+}
+
+.btn-icon {
+    color: black;
+    background-color: white;
+    border-color: black;
+    border-radius: 9px;
+}

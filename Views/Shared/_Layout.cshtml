@@ -1,0 +1,424 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ExamenIIRedes</title>
+    <!--<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />-->
+     <link rel="stylesheet" href=
+"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity=
+"sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ExamenIIRedes.styles.css" asp-append-version="true" />
+     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" />
+</head>
+<div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+</div>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3" id="navB">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">VacunaDOS</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        @*<li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>*@
+                        <li>
+                            <a id="config" role="button" class="button" data-target="#modalConfig" data-toggle="modal"><img src="/images/configuraciones.png"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+        <!-- Modal -->
+<div class="modal fade" id="modalConfig" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" >Servidor</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+         <div class="form-group">
+            <label for="direccion" class="col-form-label">Dirección:</label>
+            <input type="text" class="form-control" id="direccion">
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-outline-info" id="btn-endpoint">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container" id="localRemoteGames">
+    <div class="d-flex justify-content-center" >
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="card" style="width:400px;height:460px">
+                    <img class="card-img-top" src="images/local.jpg" alt="Card image" style="width:400px;height:350px">
+                    <div class="card-body">
+                        <h4 class="card-title">Crear Partida</h4>
+                        <button class="btn btn-primary" id="localGame-btn">Iniciar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 mb-4">
+                <div class="card" style="width:400px;height:460px">
+                    <img class="card-img-top" src="images/Busca-partida.jpg" alt="Card image" style="width:400px;height:350px">
+                        <div class="card-body">
+                            <h4 class="card-title">Partida Remota</h4>
+                            <button class="btn btn-primary" id="btn-RemoteGame">Iniciar</button>
+                        </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    </div>
+
+    <section id="gamesLobbyTable">
+        <div class="container">
+            <div class="row">
+                 
+                     
+                     <div class="col-sm-10">
+                     <div class="section-title">
+                    <h2>Juegos disponibles</h2>
+                </div>
+
+                </div>
+
+                <div class="col">
+                    
+                            <button type="button" class="btn btn-outline-secondary" onclick="rechargeGames()">
+                                <svg xmlns = "http://www.w3.org/2000/svg" width = "16" height = "16" fill = "currentColor" class="bi bi-arrow-clockwise" viewBox = "0 0 16 16" >
+                                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"></path>
+                                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"></path></svg >
+                            </button >
+                            
+                            </div >
+                            
+             </>
+
+                <div class="col-md-12 col-sm-12">
+
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered table-hover" id="gamesTable-Lobby">
+
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Identificador
+                                    </th>
+                                    <th>
+                                        Nombre 
+                                    </th>
+                                    <th>
+                                        Unirme al juego
+                                    </th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="gamesLobby-tboody">
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+    </section>
+
+    <!-- Modal Join Game-->
+<div class="modal fade" id="modal-join-game" tabindex="-1" role="dialog" aria-labelledby="modalAddPlayer" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" >Unirme a un juego</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+         <div class="form-group">
+            <label for="user-name" class="col-form-label">Nombre de usuario:</label>
+            <input type="text" class="form-control" id="user-name" required>
+            <label for="password-game" class="col-form-label">Contraseña:</label>
+            <input type="password" class="form-control" id="passwordRemoteGame" required>
+            
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="joinRemoteGame">Unirme</button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+<div class="container" id="game-score">
+    <div class="col-md-12 col-sm-12">
+
+                        <div class="table-responsive">
+                     
+                            <table class="table table-striped" id="score-table"> 
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>
+                                            Exemplaries
+                                        </th>
+                                         <th>
+                                             Psychos
+                                        </th>
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <label id="ExeScore" style="font-size: 25px">0</label>
+                                        </td>
+                                        <td>
+                                            <label id="PsychoScore" style="font-size: 25px">0</label>
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+</div>
+</div>
+</div>
+<div class="container" id="participants-list">
+<div class="d-flex justify-content-center mb-4" >
+    
+                <div class="card" style="width:400px;height:500px">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-center">
+                        <h3>Participants List</h3>
+                        </div>
+                    </div>
+                    
+                        <div class="card-body">
+                            <div class="d-flex justify-content-center">
+                            <ol start="1" id="part-list">
+
+                            </ol>
+                            </div>
+                            
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-center">
+                                <div class="col-lg-6 mb-1">
+                                <button class="btn btn-primary" id="display-modal" >Añadir Jugador</button>
+                                </div>
+                                <div class="col-lg-6 mb-1">
+                                <button class="btn btn-primary" id="StarGame" >Comenzar Juego</button>
+                                </div>
+                            </div>
+                            </div>
+                        
+                </div>
+            
+
+</div>
+</div>
+<div class="container" id="remoteParticipants-list">
+<div class="d-flex justify-content-center mb-4" >
+    
+                <div class="card" style="width:400px;height:500px">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-end" style="height:32px;">
+                            <button type="button" class="btn btn-outline-secondary" onclick="rechargePartList()">
+                                <svg xmlns = "http://www.w3.org/2000/svg" width = "16" height = "16" fill = "currentColor" class="bi bi-arrow-clockwise" viewBox = "0 0 16 16" >
+                                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"></path>
+                                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"></path></svg >
+                            </button >
+                            </div >
+                        <div class="d-flex justify-content-center">
+                        <h3>Participants List</h3>
+                        </div>
+                    </div>
+                    
+                        <div class="card-body">
+                            <div class="d-flex justify-content-center">
+                            <ol start="1" id="remotePart-list">
+
+                            </ol>
+                            </div>
+                            
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-center">
+                                <div class="mb-1">
+                                <button class="btn btn-primary" id="startRemoteGame" >Comenzar Juego</button>
+                                </div>
+                            </div>
+                            </div>
+                        
+                </div>
+            
+
+</div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modal-add-player" tabindex="-1" role="dialog" aria-labelledby="modalAddPlayer" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" >Ingresar Jugador</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+         <div class="form-group">
+            <label for="player-name" class="col-form-label">Nombre:</label>
+            <input type="text" class="form-control" id="player-name" required>
+            <label for="password-game" class="col-form-label">Contraseña:</label>
+            <input type="password" class="form-control" id="password-game" required>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="Add-player">Agregar Jugador</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="container" id="create-Game-Sect">
+    <div class="d-flex justify-content-center mb-4" >
+    
+                <div class="card" style="width:400px">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-center">
+                        <h3 >Crear Juego</h3>
+                        </div>
+                    </div>
+                    <form id="game-form">
+                        <div class="card-body">
+                            <div class="container">
+                                
+                                    <div class="form-group" id="createGameForm">
+                                        <div class="form-group">
+                                            <label for="ownerName">Nombre del dueño</label>
+                                            <input type="text" class="form-control" id="ownerNameInput"  placeholder="Nombre del Dueño" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="gameName">Nombre del juego</label>
+                                            <input type="text" class="form-control" id="gameNameInput"  placeholder="Nombre del Juego" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="gamePassword">Contraseña de la partida</label>
+                                            <input type="password" class="form-control" id="gamePassword" placeholder="Contraseña" required>
+                                        </div>
+                                        <div class="row">
+                                                <div class="col-lg-6 mb-1">
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input" id="checkLocal">
+                                                        <label class="custom-control-label" for="checkLocal">Partida Local</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 mb-1">
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input" id="checkRemote">
+                                                        <label class="custom-control-label" for="checkRemote">Partida Remota</label>
+                                                    </div>
+                                                </div>
+                                        </div>
+                                        
+                                    </div>
+                               
+                            </div>
+                            
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-center">
+                                <button type="submit" class="btn btn-primary" >Crear</button>
+                            </div>
+                            </div>
+
+
+                    </form>
+                        
+                </div>
+                </div>
+</div>
+
+
+<div class="container" id="container-game-cards">
+        <div class="row" id="row-cardGame">
+
+        
+        </div>
+    
+</div>
+<div class="container" id="container1-game-cards">
+        <div class="d-flex justify-content-center" id="row-remoteCardGame">
+
+        
+        </div>
+    
+</div>
+
+
+  <div class="container">
+      
+
+
+  </div>
+
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2022 - ExamenIIRedes - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <!--<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>-->
+    <script src="~/js/site.js" asp-append-version="true"></script>
+   <script src="js/remoteGame.js"></script>
+   <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src=
+"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity=
+"sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous">
+    </script>
+     <script
+src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.
+0/sha256.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
