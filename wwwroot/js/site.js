@@ -44,7 +44,7 @@ $(document).ready(function () {
 
 });
 var playerAmount;
-var endpoint = "https://contaminados.meseguercr.com/api/games";
+var endpoint = "https://contaminados.meseguercr.com/api/games/";
 var localGameId;
 var gameId;
 var playerCount = 1;
@@ -1471,18 +1471,19 @@ function sendLocalGroup(playerName) {
 
 function LoadGames() {
     $.ajax({
-        url: endpoint + "?filter=status&filterValue=lobby",
+        url: endpoint ,
         type: "GET",
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         success: function (result) {
             var html = '';
-            $.each(result, function (key, item) {
-
+            //console.log(JSON.stringify(result));
+            $.each(result.data, function (key, item) {
+     
                 html += '<tr>';
-                html += '<td>' + item.gameId + '</td>';
+                html += '<td>' + item.id + '</td>';
                 html += '<td>' + item.name + '</td>';
-                html += '<td> <button class="btn btn-primary" id="display-JoinModal" onclick="modalJoin(\'' + item.gameId + '\')">Unirme</button></td>';
+                html += '<td> <button class="btn btn-primary" id="display-JoinModal" onclick="modalJoin(\'' + item.id + '\')">Unirme</button></td>';
 
 
                 html += '</tr>';

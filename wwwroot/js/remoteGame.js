@@ -24,21 +24,34 @@ function getInfoGame() {
         }
     }).responseText);
 }
+function numberToGuid(number) {
+    // Convierte el número a una cadena hexadecimal de 32 dígitos
+    var hexString = number.toString(16);
 
+    // Agrega hífen (opcional)
+    var formattedGuid = hexString.slice(0, 8) + '-' +
+        hexString.slice(8, 12) + '-' +
+        hexString.slice(12, 16) + '-' +
+        hexString.slice(16, 20) + '-' +
+        hexString.slice(20);
+
+    return formattedGuid;
+}
 function addPlayerRemote() {
     var psychoWins = 0;
     var psychosLost = 0;
-    var gameJoin = remoteGameId + "/join"
-    remoteNamePlayer = $('#user-name').val();
+    //var gameJoin = remoteGameId + "/join"
+    //remoteNamePlayer = $('#user-name').val();
     var rGamePassword = $('#passwordRemoteGame').val();
-    remoteGamePassword = sha256(rGamePassword);
+    //remoteGamePassword = sha256(rGamePassword);
     $('#password-game').val('');
     $('#user-name').val('');
-
+    alert("hola");
+    console.log(remoteGameId);
     $.ajax({
 
-        url: endpoint + gameJoin,
-        headers: { name: remoteNamePlayer, password: remoteGamePassword },
+        url: endpoint + numberToGuid(remoteGameId),
+        headers: { player: remoteNamePlayer, password: remoteGamePassword },
         type: "PUT",
         dataType: "json",
         contentType: "application/json",
