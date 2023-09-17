@@ -1,10 +1,4 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-
-
-
-// Write your JavaScript code.
+﻿
 
 
 $(document).ready(function () {
@@ -50,7 +44,7 @@ $(document).ready(function () {
 
 });
 var playerAmount;
-var endpoint = "https://vacunados.meseguercr.com/game/";
+var endpoint = "https://contaminados.meseguercr.com/api/games";
 var localGameId;
 var gameId;
 var playerCount = 1;
@@ -70,6 +64,7 @@ var status;
 function getEndPoint() {
     return endpoint;
 }
+
 function startGame() {
 
     var gameStart = gameId + "/start"
@@ -627,6 +622,22 @@ function sendPath(playerName) {
     });
 
 }
+
+//GET public 
+function getGame() {
+    return JSON.parse($.ajax({
+        type: 'GET',
+        url: endpoint,
+        dataType: 'json',
+        global: false,
+        async: false,
+        success: function (data) {
+            return data;
+        }
+    }).responseText);
+}
+
+//GET authenticated
 function getGame() {
     return JSON.parse($.ajax({
         type: 'GET',
@@ -730,30 +741,31 @@ function addPlayer() {
 }
 
 
-
+//POST Authenticated
 function createGame() {
-    var gameCreate = "create"
+    //var gameCreate = "create"
     if ($('#checkLocal').prop('checked') || $('#checkRemote').prop('checked')) {
         if ($('#checkLocal').prop('checked')) {
             var ownerName = $('#ownerNameInput').val();
             var gameName = $('#gameNameInput').val();
             var gamePassword = $('#gamePassword').val();
-            gamePassword = sha256(gamePassword);
+            //gamePassword = sha256(gamePassword);
             gameOwner = ownerName;
             gamePassw = gamePassword;
-            $.ajax({
-                url: endpoint + gameCreate,
-                headers: { name: ownerName },
-                type: "POST",
-                data: JSON.stringify({ name: gameName, password: gamePassword }),
-                dataType: "json",
-                contentType: "application/json",
-                success: function (result) {
+            $.ajax({               
+                url: endpoint,
+                headers: { owner: ownerName, name: gameName },
+                type: 'POST',
+                data: JSON.stringify({ name: gameName, owner: ownerName, password: gamePassword }),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (result) {                
                     $('#create-Game-Sect').hide();
                     $('#participants-list').show();
                     //localRemoteGames
                     //$("#display-modal").hide();
-                    gameId = result.gameId;
+
+                    gameId = result.data.id;
                     var html = "<li>" + ownerName + "</li>";
                     $('#part-list').html(html);
                     $('#ownerNameInput').val('');
@@ -761,12 +773,24 @@ function createGame() {
                     $('#gamePassword').val('');
 
                 },
+                
                 error: function (errorMessage) {
-                    if (errorMessage.status == 406) {
+                    alert("error");
+                    if (errorMessage.status == 400) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'Falta información por llenar ',
+                            text: 'Client error',
+                            showConfirmButton: false,
+                            timer: 1800
+                        });
+
+                    }
+                    if (errorMessage.status == 409) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Asset already exists',
                             showConfirmButton: false,
                             timer: 1800
                         });
@@ -784,7 +808,7 @@ function createGame() {
             gameOwner = ownerName;
             gamePassw = gamePassword;
             $.ajax({
-                url: endpoint + gameCreate,
+                url: endpoint,
                 headers: { name: ownerName },
                 type: "POST",
                 data: JSON.stringify({ name: gameName, password: gamePassword }),
@@ -804,11 +828,11 @@ function createGame() {
 
                 },
                 error: function (errorMessage) {
-                    if (errorMessage.status == 406) {
+                    if (errorMessage.status == 400) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'Falta información por llenar ',
+                            text: 'Client error',
                             showConfirmButton: false,
                             timer: 1800
                         });
@@ -816,6 +840,7 @@ function createGame() {
                     }
 
                 }
+
             });
 
 
@@ -832,6 +857,7 @@ function createGame() {
         });
     }
 }
+
 function rechargePartList() {
     var gameInfo = getGame();
     var html = '';
@@ -866,7 +892,7 @@ function changeEndpoint() {
                 });
 
             }
-            endpoint = "https://vacunados.meseguercr.com/game/";
+            endpoint = "https://contaminados.meseguercr.com/api/games/";
 
         }
     });
