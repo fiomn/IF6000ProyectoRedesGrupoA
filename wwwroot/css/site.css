@@ -20,6 +20,10 @@ body {
     background: linear-gradient(white, #64DAC1 );
 }
 
+#title {
+    margin-left: 25em;
+}
+
 #config {
     margin-left: 65em;
 }
@@ -34,12 +38,12 @@ body {
 }
 
 #navB {
-    background-color: #8D9392;
-    border-radius: 20px;
+    border-color: #8D9392;
+    border: 20px;
 }
 
 
-a, header, body, thead, tbody, h1, h2, h3, h4, h5, h6 {
+header, body, thead, tbody, h1, h2, h3, h4, h5, h6 {
     font-family: 'Raleway';
     color: black;
 }
@@ -81,11 +85,16 @@ html {
 
 body {
     margin-bottom: 60px;
-    background: linear-gradient(white, #64DAC1 );
+    background: linear-gradient(white, #4cff00 );
+}
+
+#title {
+    margin-left: 28.5em;
+    color: black;
 }
 
 #config {
-    margin-left: 65em;
+    margin-left: 30em;
 }
 
 .modal-content {
@@ -98,12 +107,12 @@ body {
 }
 
 #navB {
-    background-color: #8D9392;
-    border-radius: 20px;
+    border-color: #8D9392;
+    border: 20px;
 }
 
 
-a, header, body, thead, tbody, h1, h2, h3, h4, h5, h6 {
+header, body, thead, tbody, h1, h2, h3, h4, h5, h6 {
     font-family: 'Raleway';
     color: black;
 }

@@ -71,7 +71,7 @@ function startGame() {
     $('#participants-list').hide();
     $.ajax({
         url: endpoint + gameStart,
-        headers: { name: gameOwner, password: gamePassw },
+        headers: { password: gamePassw, player: gameOwner },
         type: "HEAD",
         dataType: "json",
         success: function (result) {
@@ -170,7 +170,7 @@ function startGame() {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'El nombre del dueño es incorrecto',
+                    text: 'Unauthorized',
                     showConfirmButton: false,
                     timer: 1800
                 });
@@ -180,7 +180,7 @@ function startGame() {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'El jugador no esta en lista de jugadores',
+                    text: 'Forbidden',
                     showConfirmButton: false,
                     timer: 1800
                 });
@@ -190,7 +190,27 @@ function startGame() {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'El id del juego es inválido',
+                    text: 'Game not found',
+                    showConfirmButton: false,
+                    timer: 1800
+                });
+
+            }
+            if (errorMessage.status == 409) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Game already started',
+                    showConfirmButton: false,
+                    timer: 1800
+                });
+
+            }
+            if (errorMessage.status == 428) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Need 5 players to start',
                     showConfirmButton: false,
                     timer: 1800
                 });
@@ -653,7 +673,6 @@ function getGame() {
 }
 
 function addPlayer() {
-
     var gameJoin = gameId + "/join"
     var playerName = $('#player-name').val();
     var passwordGame = $('#password-game').val();
@@ -681,51 +700,37 @@ function addPlayer() {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'La contraseña es incorrecta',
+                    text: 'Invalid credentials',
                     showConfirmButton: false,
                     timer: 1800
                 });
-
-            }
-            if (errorMessage.status == 403) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'No eres parte de la lista de jugadores',
-                    showConfirmButton: false,
-                    timer: 1800
-                });
-
             }
             if (errorMessage.status == 404) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'El id del juego es inválido',
+                    text: 'The specified resource was not found',
                     showConfirmButton: false,
                     timer: 1800
                 });
-
-            }
-            if (errorMessage.status == 406) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'El juego ya comenzó o esta lleno ',
-                    showConfirmButton: false,
-                    timer: 1800
-                });
-
-            }
+            }            
             if (errorMessage.status == 409) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'El jugador ya es parte del juego',
+                    text: 'Asset already exists',
                     showConfirmButton: false,
                     timer: 1800
                 });
-
+            }
+            if (errorMessage.status == 428) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'This action is not allowed at this time',
+                    showConfirmButton: false,
+                    timer: 1800
+                });
             }
 
         }
@@ -749,7 +754,6 @@ function createGame() {
             var ownerName = $('#ownerNameInput').val();
             var gameName = $('#gameNameInput').val();
             var gamePassword = $('#gamePassword').val();
-            //gamePassword = sha256(gamePassword);
             gameOwner = ownerName;
             gamePassw = gamePassword;
             $.ajax({               
@@ -862,6 +866,7 @@ function rechargePartList() {
     var gameInfo = getGame();
     var html = '';
     $.each(gameInfo.players, function (key, element) {
+        alert("jugadores" + element);
         html += "<li>" + element + "</li>";
 
 

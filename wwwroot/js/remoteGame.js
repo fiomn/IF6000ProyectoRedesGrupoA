@@ -24,6 +24,7 @@ function getInfoGame() {
         }
     }).responseText);
 }
+
 function numberToGuid(number) {
     // Convierte el número a una cadena hexadecimal de 32 dígitos
     var hexString = number.toString(16);

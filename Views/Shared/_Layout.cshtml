@@ -9,7 +9,6 @@
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
           crossorigin="anonymous">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" />
 </head>
 <div class="container">
@@ -21,16 +20,16 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3" id="navB">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ContaminaDOS</a>
+                <a id="title" class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ContaminaDOS</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
+                       @* <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
+                        </li>*@
                         @*<li class="nav-item">
                         <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>*@
@@ -71,7 +70,7 @@
             <div class="row">
                 <div class="col-lg-6 mb-4">
                     <div class="card" style="width:400px;height:460px">
-                        <img class="card-img-top" src="images/local.jpg" alt="Card image" style="width:400px;height:350px">
+                        <img class="card-img-top" src="images/planet.jpg" alt="Card image" style="width:398px;height:320px">
                         <div class="card-body">
                             <h4 class="card-title">Crear Partida</h4>
                             <button class="btn btn-primary" id="localGame-btn">Iniciar</button>
@@ -81,7 +80,7 @@
 
                 <div class="col-lg-6 mb-4">
                     <div class="card" style="width:400px;height:460px">
-                        <img class="card-img-top" src="images/Busca-partida.jpg" alt="Card image" style="width:400px;height:350px">
+                        <img class="card-img-top" src="images/3726696.webp" alt="Card image" style="width:380px;height:330px">
                         <div class="card-body">
                             <h4 class="card-title">Partida Remota</h4>
                             <button class="btn btn-primary" id="btn-RemoteGame">Iniciar</button>
@@ -395,7 +394,6 @@
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <!--<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>-->
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="js/remoteGame.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
