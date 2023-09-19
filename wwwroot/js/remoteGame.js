@@ -41,18 +41,19 @@ function addPlayerRemote() {
     var psychoWins = 0;
     var psychosLost = 0;
     //var gameJoin = remoteGameId + "/join"
-    //remoteNamePlayer = $('#user-name').val();
+    remoteNamePlayer = $('#user-name').val();
     var rGamePassword = $('#passwordRemoteGame').val();
     //remoteGamePassword = sha256(rGamePassword);
     $('#password-game').val('');
     $('#user-name').val('');
-    alert("hola");
-    console.log(remoteGameId);
+    //alert(remoteGame);
+    //console.log(remoteNamePlayer);
     $.ajax({
 
-        url: endpoint + numberToGuid(remoteGameId),
-        headers: { player: remoteNamePlayer, password: remoteGamePassword },
+        url: endpoint + remoteGameId,
+        headers: { player: remoteNamePlayer, password: rGamePassword, },
         type: "PUT",
+        data: JSON.stringify({ player: remoteNamePlayer }),
         dataType: "json",
         contentType: "application/json",
         success: function (result) {
