@@ -676,7 +676,7 @@ function addPlayer() {
     var gameJoin = gameId + "/join"
     var playerName = $('#player-name').val();
     var passwordGame = $('#password-game').val();
-    passwordGame = sha256(passwordGame);
+    //passwordGame = sha256(passwordGame);
     $.ajax({
         url: endpoint + gameJoin,
         headers: { name: playerName, password: passwordGame },
@@ -808,7 +808,7 @@ function createGame() {
             var ownerName = $('#ownerNameInput').val();
             var gameName = $('#gameNameInput').val();
             var gamePassword = $('#gamePassword').val();
-            gamePassword = sha256(gamePassword);
+            //gamePassword = sha256(gamePassword);
             gameOwner = ownerName;
             gamePassw = gamePassword;
             $.ajax({
