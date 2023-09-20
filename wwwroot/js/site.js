@@ -1104,7 +1104,7 @@ function startRemoteGame() {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'La contraseña es incorrecta',
+                    text: 'Unauthorized',
                     showConfirmButton: false,
                     timer: 1800
                 });
@@ -1114,7 +1114,7 @@ function startRemoteGame() {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'No eres parte de la lista de jugadores',
+                    text: 'Forbidden',
                     showConfirmButton: false,
                     timer: 1800
                 });
@@ -1124,17 +1124,7 @@ function startRemoteGame() {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'El id del juego es inválido',
-                    showConfirmButton: false,
-                    timer: 1800
-                });
-
-            }
-            if (errorMessage.status == 406) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'El juego ya comenzó o esta lleno ',
+                    text: 'Game not found',
                     showConfirmButton: false,
                     timer: 1800
                 });
@@ -1144,7 +1134,17 @@ function startRemoteGame() {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'El jugador ya es parte del juego',
+                    text: 'Game already started',
+                    showConfirmButton: false,
+                    timer: 1800
+                });
+
+            }
+            if (errorMessage.status == 428) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Need 5 players to start',
                     showConfirmButton: false,
                     timer: 1800
                 });
