@@ -1,6 +1,5 @@
 ﻿
 
-
 $(document).ready(function () {
     hide();
 
@@ -43,6 +42,7 @@ $(document).ready(function () {
     });
 
 });
+
 var playerAmount;
 var endpoint = "https://contaminados.meseguercr.com/api/games/";
 var localGameId;
@@ -243,10 +243,7 @@ function getPlayer(namePlayer, count, leaderName) {
         document.getElementById("btn" + findElem).style.background = "blue";
         playersSelected.push(findElem);
         proposedGroup.push(namePlayer);
-
-
     }
-
 
 }
 
@@ -498,12 +495,10 @@ function groupSelected() {
         });
         $('#' + item + 'roundGroup').text(html)
         $('#' + item + 'roundGroup').show()
-
-
-
     });
-
 }
+
+
 function sendPath(playerName) {
     $.ajax({
         url: endpoint + gameId + "/go",
@@ -643,21 +638,23 @@ function sendPath(playerName) {
 
 }
 
-//GET public 
-function getGame() {
-    return JSON.parse($.ajax({
-        type: 'GET',
-        url: endpoint,
-        dataType: 'json',
-        global: false,
-        async: false,
-        success: function (data) {
-            return data;
-        }
-    }).responseText);
-}
+//GET public
+//function getGamePublic() {
+//    return JSON.parse($.ajax({
+//        type: 'GET',
+//        url: endpoint,
+//        dataType: 'json',
+//        global: false,
+//        async: false,
+//        success: function (data) {
+//            return data;
+//        }
+//    }).responseText);
+//}
+
 
 //GET authenticated
+//actualiza la lista de jugadores del owner
 function getGame() {
     return JSON.parse($.ajax({
         type: 'GET',
@@ -666,89 +663,87 @@ function getGame() {
         dataType: 'json',
         global: false,
         async: false,
-        success: function (data) {
-            return data;
+        success: function (result) {
+            return result;
         }
     }).responseText);
 }
 
-function addPlayer() {
-    var gameJoin = gameId + "/join"
-    var playerName = $('#player-name').val();
-    var passwordGame = $('#password-game').val();
-    //passwordGame = sha256(passwordGame);
-    $.ajax({
-        url: endpoint + gameJoin,
-        headers: { name: playerName, password: passwordGame },
-        type: "PUT",
-        dataType: "json",
-        contentType: "application/json",
-        success: function (result) {
-            var html = '';
-            $.each(getGame().players, function (key, item) {
-                html += "<li>" + item + "</li>";
-            });
-            $('#part-list').html(html);
-            playerCount = playerCount + 1;
-            $('#player-name').val('');
-            $('#password-game').val('');
+//function addPlayer() {
+//    var gameJoin = gameId + "/join"
+//    var playerName = $('#player-name').val();
+//    var passwordGame = $('#password-game').val();
+//    $.ajax({
+//        url: endpoint + gameJoin,
+//        headers: { name: playerName, password: passwordGame },
+//        type: "PUT",
+//        dataType: "json",
+//        contentType: "application/json",
+//        success: function (result) {
+//            var html = '';
+//            $.each(getGame().players, function (key, item) {
+//                html += "<li>" + item + "</li>";
+//            });
+//            $('#part-list').html(html);
+//            playerCount = playerCount + 1;
+//            $('#player-name').val('');
+//            $('#password-game').val('');
 
 
-        },
-        error: function (errorMessage) {
-            if (errorMessage.status == 401) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Invalid credentials',
-                    showConfirmButton: false,
-                    timer: 1800
-                });
-            }
-            if (errorMessage.status == 404) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'The specified resource was not found',
-                    showConfirmButton: false,
-                    timer: 1800
-                });
-            }            
-            if (errorMessage.status == 409) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Asset already exists',
-                    showConfirmButton: false,
-                    timer: 1800
-                });
-            }
-            if (errorMessage.status == 428) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'This action is not allowed at this time',
-                    showConfirmButton: false,
-                    timer: 1800
-                });
-            }
+//        },
+//        error: function (errorMessage) {
+//            if (errorMessage.status == 401) {
+//                Swal.fire({
+//                    icon: 'error',
+//                    title: 'Error',
+//                    text: 'Invalid credentials',
+//                    showConfirmButton: false,
+//                    timer: 1800
+//                });
+//            }
+//            if (errorMessage.status == 404) {
+//                Swal.fire({
+//                    icon: 'error',
+//                    title: 'Error',
+//                    text: 'The specified resource was not found',
+//                    showConfirmButton: false,
+//                    timer: 1800
+//                });
+//            }            
+//            if (errorMessage.status == 409) {
+//                Swal.fire({
+//                    icon: 'error',
+//                    title: 'Error',
+//                    text: 'Asset already exists',
+//                    showConfirmButton: false,
+//                    timer: 1800
+//                });
+//            }
+//            if (errorMessage.status == 428) {
+//                Swal.fire({
+//                    icon: 'error',
+//                    title: 'Error',
+//                    text: 'This action is not allowed at this time',
+//                    showConfirmButton: false,
+//                    timer: 1800
+//                });
+//            }
 
-        }
-    });
-    if (playerCount == 10) {
-        document.getElementById("display-modal").disabled = true;
-    }
-    if (playerCount < 5) {
-        document.getElementById("display-modal").disabled = false;
-    }
+//        }
+//    });
+//    if (playerCount == 10) {
+//        document.getElementById("display-modal").disabled = true;
+//    }
+//    if (playerCount < 5) {
+//        document.getElementById("display-modal").disabled = false;
+//    }
 
 
-}
+//}
 
 
 //POST Authenticated
 function createGame() {
-    //var gameCreate = "create"
     if ($('#checkLocal').prop('checked') || $('#checkRemote').prop('checked')) {
         if ($('#checkLocal').prop('checked')) {
             var ownerName = $('#ownerNameInput').val();
@@ -808,21 +803,19 @@ function createGame() {
             var ownerName = $('#ownerNameInput').val();
             var gameName = $('#gameNameInput').val();
             var gamePassword = $('#gamePassword').val();
-            //gamePassword = sha256(gamePassword);
             gameOwner = ownerName;
             gamePassw = gamePassword;
             $.ajax({
                 url: endpoint,
-                headers: { name: ownerName },
+                headers: { owner: ownerName, name: gameName },
                 type: "POST",
-                data: JSON.stringify({ name: gameName, password: gamePassword }),
-                dataType: "json",
+                data: JSON.stringify({ name: gameName, owner: ownerName, password: gamePassword }),
                 contentType: "application/json",
                 success: function (result) {
                     $('#remoteParticipants-list').show();
                     //localRemoteGames
-                    //$("#display-modal").hide();
-                    gameId = result.gameId;
+                    $("#display-modal").hide();
+                    gameId = result.data.id;
                     var html = "<li>" + ownerName + "</li>";
                     $('#remotePart-list').html(html);
                     $('#ownerNameInput').val('');
@@ -846,9 +839,6 @@ function createGame() {
                 }
 
             });
-
-
-
         }
 
     } else {
@@ -872,9 +862,6 @@ function rechargePartList() {
 
     });
     $('#remotePart-list').html(html);
-
-
-
 }
 
 function changeEndpoint() {
@@ -1474,15 +1461,15 @@ function sendLocalGroup(playerName) {
 }
 
 
+//GET Public
 function LoadGames() {
     $.ajax({
-        url: endpoint ,
+        url: endpoint,
         type: "GET",
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         success: function (result) {
             var html = '';
-            //console.log(JSON.stringify(result));
             $.each(result.data, function (key, item) {
      
                 html += '<tr>';
@@ -1498,18 +1485,17 @@ function LoadGames() {
             $('#gamesTable-Lobby').DataTable();
         },
         error: function (errorMessage) {
-            // alert("Error");
             alert(errorMessage.responseText);
         }
     });
 
 }
 
+//para unirse a un juego
 function modalJoin(id) {
     gameId = id;
     remoteGameId = id;
     $('#modal-join-game').modal("show");
-
 }
 
 function showGamesTable() {
@@ -1517,6 +1503,9 @@ function showGamesTable() {
     LoadGames();
     $('#localRemoteGames').hide();
 }
+
+//devuelve todos los juegos del servidor
 function rechargeGames() {
     LoadGames();
 }
+

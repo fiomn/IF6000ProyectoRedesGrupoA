@@ -11,48 +11,18 @@ var verifySend = 0
 var cardCompleted = 0;
 
 
-function getInfoGame() {
-    return JSON.parse($.ajax({
-        type: 'GET',
-        url: endpoint + remoteGameId,
-        headers: { name: remoteNamePlayer, password: remoteGamePassword },
-        dataType: 'json',
-        global: false,
-        async: false,
-        success: function (data) {
-            return data;
-        }
-    }).responseText);
-}
 
-function numberToGuid(number) {
-    // Convierte el número a una cadena hexadecimal de 32 dígitos
-    var hexString = number.toString(16);
-
-    // Agrega hífen (opcional)
-    var formattedGuid = hexString.slice(0, 8) + '-' +
-        hexString.slice(8, 12) + '-' +
-        hexString.slice(12, 16) + '-' +
-        hexString.slice(16, 20) + '-' +
-        hexString.slice(20);
-
-    return formattedGuid;
-}
+//unir un jugador al juego
 function addPlayerRemote() {
     var psychoWins = 0;
     var psychosLost = 0;
-    //var gameJoin = remoteGameId + "/join"
     remoteNamePlayer = $('#user-name').val();
-    var rGamePassword = $('#passwordRemoteGame').val();
-    //remoteGamePassword = sha256(rGamePassword);
-    $('#password-game').val('');
-    $('#user-name').val('');
-    //alert(remoteGame);
-    //console.log(remoteNamePlayer);
+    remoteGamePassword = $('#passwordRemoteGame').val();
+    //$('#password-game').val('');
+    //$('#user-name').val('');
     $.ajax({
-
         url: endpoint + remoteGameId,
-        headers: { player: remoteNamePlayer, password: rGamePassword, },
+        headers: { player: remoteNamePlayer, password: remoteGamePassword },
         type: "PUT",
         data: JSON.stringify({ player: remoteNamePlayer }),
         dataType: "json",
@@ -102,8 +72,6 @@ function addPlayerRemote() {
             $('#' + remoteNamePlayer + 'goodPath').hide();
             $('#' + remoteNamePlayer + 'roundGroup').hide();
             $('#row-remoteCardGame').show();
-
-
         },
         error: function (errorMessage) {
             if (errorMessage.status == 401) {
@@ -156,13 +124,9 @@ function addPlayerRemote() {
                 });
 
             }
-
         }
     });
-
-
 }
-
 
 
 function rechargeRemoteCard() {
@@ -170,7 +134,7 @@ function rechargeRemoteCard() {
     var psychoWins = 0;
     var psychosLost = 0;
 
-    if (gameInfo.status == "rounds" || gameInfo.status == "leader") {
+    if (gameInfo.data.status == "rounds" || gameInfo.data.status == "lobby") {
         if (gameInfo.rounds.length != 0 && gameInfo.rounds.length == 1) {
             if (cardCompleted == 0) {
                 var html1 = '';
@@ -233,8 +197,9 @@ function rechargeRemoteCard() {
         }
     }
 
-    gameStatus = gameInfo.status;
-    if (gameInfo.rounds.length != 0) {
+    console.log(JSON.stringify(gameInfo));
+    gameStatus = gameInfo.data.status;
+    if (gameInfo.data.rounds.length != 0) {
         remoteRound = gameInfo.rounds.length - 1;
     }
     $('#player' + remoteNamePlayer + 'buttons').hide();
@@ -300,8 +265,6 @@ function rechargeRemoteCard() {
                 $('#' + remoteNamePlayer + 'roundGroup').text(info);
                 $('#' + remoteNamePlayer + 'roundGroup').show();
             }
-
-
         });
 
     }
@@ -330,6 +293,21 @@ function rechargeRemoteCard() {
     }
 
 
+}
+
+//Buscar un juego por ID (refresh)
+function getInfoGame() {
+    return JSON.parse($.ajax({
+        type: 'GET',
+        url: endpoint + remoteGameId,
+        headers: { player: remoteNamePlayer, password: remoteGamePassword },
+        dataType: 'json',
+        global: false,
+        async: false,
+        success: function (data) {
+            return data;
+        }
+    }).responseText);
 }
 
 function proposedRemoteGroupInfo() {
