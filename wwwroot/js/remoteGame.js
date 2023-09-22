@@ -1,5 +1,4 @@
-﻿
-var remoteNamePlayer;
+﻿var remoteNamePlayer;
 var remoteGamePassword;
 var remoteGameId;
 var remotePath;
@@ -11,18 +10,35 @@ var verifySend = 0
 var cardCompleted = 0;
 
 
+function getInfoGame() {
+    return JSON.parse($.ajax({
+        type: 'GET',
+        url: endpoint + remoteGameId,
+        headers: { player: remoteNamePlayer, password: remoteGamePassword },
+        dataType: 'json',
+        global: false,
+        async: false,
+        success: function (data) {
+            return data;
+        }
+    }).responseText);
+}
 
-//unir un jugador al juego
 function addPlayerRemote() {
     var psychoWins = 0;
     var psychosLost = 0;
+    //var gameJoin = remoteGameId + "/join"
     remoteNamePlayer = $('#user-name').val();
     remoteGamePassword = $('#passwordRemoteGame').val();
-    //$('#password-game').val('');
-    //$('#user-name').val('');
+    //remoteGamePassword = sha256(rGamePassword);
+    $('#password-game').val('');
+    $('#user-name').val('');
+    //alert(remoteGame);
+    //console.log(remoteNamePlayer);
     $.ajax({
+
         url: endpoint + remoteGameId,
-        headers: { player: remoteNamePlayer, password: remoteGamePassword },
+        headers: { player: remoteNamePlayer, password: remoteGamePassword, },
         type: "PUT",
         data: JSON.stringify({ player: remoteNamePlayer }),
         dataType: "json",
@@ -72,6 +88,8 @@ function addPlayerRemote() {
             $('#' + remoteNamePlayer + 'goodPath').hide();
             $('#' + remoteNamePlayer + 'roundGroup').hide();
             $('#row-remoteCardGame').show();
+
+
         },
         error: function (errorMessage) {
             if (errorMessage.status == 401) {
@@ -124,9 +142,13 @@ function addPlayerRemote() {
                 });
 
             }
+
         }
     });
+
+
 }
+
 
 
 function rechargeRemoteCard() {
@@ -134,7 +156,7 @@ function rechargeRemoteCard() {
     var psychoWins = 0;
     var psychosLost = 0;
 
-    if (gameInfo.data.status == "rounds" || gameInfo.data.status == "lobby") {
+    if (gameInfo.status == "rounds" || gameInfo.status == "leader") {
         if (gameInfo.rounds.length != 0 && gameInfo.rounds.length == 1) {
             if (cardCompleted == 0) {
                 var html1 = '';
@@ -197,9 +219,8 @@ function rechargeRemoteCard() {
         }
     }
 
-    console.log(JSON.stringify(gameInfo));
-    gameStatus = gameInfo.data.status;
-    if (gameInfo.data.rounds.length != 0) {
+    gameStatus = gameInfo.status;
+    if (gameInfo.rounds.length != 0) {
         remoteRound = gameInfo.rounds.length - 1;
     }
     $('#player' + remoteNamePlayer + 'buttons').hide();
@@ -265,6 +286,8 @@ function rechargeRemoteCard() {
                 $('#' + remoteNamePlayer + 'roundGroup').text(info);
                 $('#' + remoteNamePlayer + 'roundGroup').show();
             }
+
+
         });
 
     }
@@ -293,21 +316,6 @@ function rechargeRemoteCard() {
     }
 
 
-}
-
-//Buscar un juego por ID (refresh)
-function getInfoGame() {
-    return JSON.parse($.ajax({
-        type: 'GET',
-        url: endpoint + remoteGameId,
-        headers: { player: remoteNamePlayer, password: remoteGamePassword },
-        dataType: 'json',
-        global: false,
-        async: false,
-        success: function (data) {
-            return data;
-        }
-    }).responseText);
 }
 
 function proposedRemoteGroupInfo() {

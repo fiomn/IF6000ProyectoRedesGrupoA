@@ -1,6 +1,4 @@
-﻿
-
-$(document).ready(function () {
+﻿$(document).ready(function () {
     hide();
 
     document.getElementById("display-modal").addEventListener("click", function () {
@@ -42,7 +40,6 @@ $(document).ready(function () {
     });
 
 });
-
 var playerAmount;
 var endpoint = "https://contaminados.meseguercr.com/api/games/";
 var localGameId;
@@ -243,7 +240,10 @@ function getPlayer(namePlayer, count, leaderName) {
         document.getElementById("btn" + findElem).style.background = "blue";
         playersSelected.push(findElem);
         proposedGroup.push(namePlayer);
+
+
     }
+
 
 }
 
@@ -495,10 +495,12 @@ function groupSelected() {
         });
         $('#' + item + 'roundGroup').text(html)
         $('#' + item + 'roundGroup').show()
+
+
+
     });
+
 }
-
-
 function sendPath(playerName) {
     $.ajax({
         url: endpoint + gameId + "/go",
@@ -639,7 +641,7 @@ function sendPath(playerName) {
 }
 
 //GET public
-//function getGamePublic() {
+//function getGame() {
 //    return JSON.parse($.ajax({
 //        type: 'GET',
 //        url: endpoint,
@@ -654,17 +656,17 @@ function sendPath(playerName) {
 
 
 //GET authenticated
-//actualiza la lista de jugadores del owner
+//trae un juego por ID (refresh)
 function getGame() {
     return JSON.parse($.ajax({
         type: 'GET',
         url: endpoint + gameId,
-        headers: { name: gameOwner, password: gamePassw },
+        headers: { player: gameOwner, password: gamePassw },
         dataType: 'json',
         global: false,
         async: false,
-        success: function (result) {
-            return result;
+        success: function (data) {
+            return data;
         }
     }).responseText);
 }
@@ -673,6 +675,7 @@ function getGame() {
 //    var gameJoin = gameId + "/join"
 //    var playerName = $('#player-name').val();
 //    var passwordGame = $('#password-game').val();
+//    //passwordGame = sha256(passwordGame);
 //    $.ajax({
 //        url: endpoint + gameJoin,
 //        headers: { name: playerName, password: passwordGame },
@@ -709,7 +712,7 @@ function getGame() {
 //                    showConfirmButton: false,
 //                    timer: 1800
 //                });
-//            }            
+//            }
 //            if (errorMessage.status == 409) {
 //                Swal.fire({
 //                    icon: 'error',
@@ -751,14 +754,14 @@ function createGame() {
             var gamePassword = $('#gamePassword').val();
             gameOwner = ownerName;
             gamePassw = gamePassword;
-            $.ajax({               
+            $.ajax({
                 url: endpoint,
                 headers: { owner: ownerName, name: gameName },
                 type: 'POST',
                 data: JSON.stringify({ name: gameName, owner: ownerName, password: gamePassword }),
                 dataType: 'json',
                 contentType: 'application/json',
-                success: function (result) {                
+                success: function (result) {
                     $('#create-Game-Sect').hide();
                     $('#participants-list').show();
                     //localRemoteGames
@@ -772,7 +775,7 @@ function createGame() {
                     $('#gamePassword').val('');
 
                 },
-                
+
                 error: function (errorMessage) {
                     alert("error");
                     if (errorMessage.status == 400) {
@@ -810,11 +813,12 @@ function createGame() {
                 headers: { owner: ownerName, name: gameName },
                 type: "POST",
                 data: JSON.stringify({ name: gameName, owner: ownerName, password: gamePassword }),
+                dataType: "json",
                 contentType: "application/json",
                 success: function (result) {
                     $('#remoteParticipants-list').show();
                     //localRemoteGames
-                    $("#display-modal").hide();
+                    //$("#display-modal").hide();
                     gameId = result.data.id;
                     var html = "<li>" + ownerName + "</li>";
                     $('#remotePart-list').html(html);
@@ -839,6 +843,9 @@ function createGame() {
                 }
 
             });
+
+
+
         }
 
     } else {
@@ -862,6 +869,9 @@ function rechargePartList() {
 
     });
     $('#remotePart-list').html(html);
+
+
+
 }
 
 function changeEndpoint() {
@@ -1142,6 +1152,18 @@ function startRemoteGame() {
     });
 
 
+}
+
+function recharge() {
+    var infoGame = getGame();
+    var $olList = $("#part-list");
+    $olList.empty();
+
+    $.each(infoGame.data.players, function (index, player) {
+        var $li = $("<li></li>").text(player); 
+
+        $olList.append($li);
+    });
 }
 
 function rechargeCard() {
@@ -1461,7 +1483,6 @@ function sendLocalGroup(playerName) {
 }
 
 
-//GET Public
 function LoadGames() {
     $.ajax({
         url: endpoint,
@@ -1471,7 +1492,7 @@ function LoadGames() {
         success: function (result) {
             var html = '';
             $.each(result.data, function (key, item) {
-     
+
                 html += '<tr>';
                 html += '<td>' + item.id + '</td>';
                 html += '<td>' + item.name + '</td>';
@@ -1491,11 +1512,11 @@ function LoadGames() {
 
 }
 
-//para unirse a un juego
 function modalJoin(id) {
     gameId = id;
     remoteGameId = id;
     $('#modal-join-game').modal("show");
+
 }
 
 function showGamesTable() {
@@ -1508,4 +1529,3 @@ function showGamesTable() {
 function rechargeGames() {
     LoadGames();
 }
-

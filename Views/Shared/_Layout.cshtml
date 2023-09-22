@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿﻿
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -96,6 +97,8 @@
     <section id="gamesLobbyTable">
         <div class="container">
             <div class="row">
+
+
                 <div class="col-sm-10">
                     <div class="section-title">
                         <h2>Juegos disponibles</h2>
@@ -114,37 +117,36 @@
 
                 </div>
 
-            </div>
+                </>
 
-            <div class="col-md-12 col-sm-12">
+                <div class="col-md-12 col-sm-12">
 
-                <div class="table-responsive">
+                    <div class="table-responsive">
 
-                    <table class="table table-bordered table-hover" id="gamesTable-Lobby">
+                        <table class="table table-bordered table-hover" id="gamesTable-Lobby">
 
-                        <thead>
-                            <tr>
-                                <th>
-                                    Identificador
-                                </th>
-                                <th>
-                                    Nombre
-                                </th>
-                                <th>
-                                    Unirme al juego
-                                </th>
-                            </tr>
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Identificador
+                                    </th>
+                                    <th>
+                                        Nombre
+                                    </th>
+                                    <th>
+                                        Unirme al juego
+                                    </th>
+                                </tr>
 
-                        </thead>
+                            </thead>
 
-                        <tbody id="gamesLobby-tboody">
-                        </tbody>
+                            <tbody id="gamesLobby-tboody">
+                            </tbody>
 
-                    </table>
+                        </table>
+                    </div>
                 </div>
-            </div>
     </section>
-
 
     <!-- Modal Join Game-->
     <div class="modal fade" id="modal-join-game" tabindex="-1" role="dialog" aria-labelledby="modalAddPlayer" aria-hidden="true">
@@ -213,16 +215,25 @@
         </div>
     </div>
 
-    <!-- Lista de participantes en owner -->
+    <!-- lista de jugadores para el owner -->
     <div class="container" id="participants-list">
         <div class="d-flex justify-content-center mb-4">
 
             <div class="card" style="width:400px;height:500px">
                 <div class="card-header">
+                    <div class="d-flex justify-content-end" style="height:32px;">
+                        <button type="button" class="btn btn-outline-secondary" onclick="recharge()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"></path>
+                                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"></path>
+                            </svg>
+                        </button>
+                    </div>
                     <div class="d-flex justify-content-center">
                         <h3>Participants List</h3>
                     </div>
                 </div>
+
                 <div class="card-body">
                     <div class="d-flex justify-content-center">
                         <ol start="1" id="part-list">
@@ -247,20 +258,20 @@
         </div>
     </div>
 
-    <!-- Lista de participantes en usuarios -->
+    <!-- lista de jugadores para usuarios -->
     <div class="container" id="remoteParticipants-list">
         <div class="d-flex justify-content-center mb-4">
 
             <div class="card" style="width:400px;height:500px">
                 <div class="card-header">
-                    <div class="d-flex justify-content-end" style="height:32px;">
+                    @*<div class="d-flex justify-content-end" style="height:32px;">
                         <button type="button" class="btn btn-outline-secondary" onclick="rechargePartList()">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"></path>
                                 <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"></path>
                             </svg>
                         </button>
-                    </div>
+                    </div>*@
                     <div class="d-flex justify-content-center">
                         <h3>Participants List</h3>
                     </div>
@@ -399,6 +410,10 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="js/remoteGame.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous">
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @await RenderSectionAsync("Scripts", required: false)
