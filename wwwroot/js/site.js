@@ -862,8 +862,8 @@ function createGame() {
 function rechargePartList() {
     var gameInfo = getGame();
     var html = '';
-    $.each(gameInfo.players, function (key, element) {
-        alert("jugadores" + element);
+    $.each(gameInfo.data.players, function (key, element) {
+        //alert("jugadores" + element);
         html += "<li>" + element + "</li>";
 
 
