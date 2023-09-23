@@ -115,17 +115,17 @@ function startGame() {
                 html += '<h5 id="' + item + 'roundGroup"></h5>';
                 html += '</div>';
                 html += '<div class="mb-1">';
-                html += '<button type="button" class="btn-primary" id="' + item + 'goodPath" onclick="goodPath()" value="Camino Seguro"> Camino Seguro</button>';
+                html += '<button type="button" class="btn-outline-success" id="' + item + 'goodPath" onclick="goodPath()" value="Camino Seguro"> Camino Seguro</button>';
                 html += '</div>';
                 if (gameInfo.psychos.includes(item) == true) {
                     html += '<div class="mb-1">';
-                    html += '<button type="button" class="btn-primary" id="' + item + 'badPath" onclick="return badPath()" value="Camino Inseguro"> Camino Inseguro</button>';
+                    html += '<button type="button" class="btn-outline-successy" id="' + item + 'badPath" onclick="return badPath()" value="Camino Inseguro"> Camino Inseguro</button>';
                     html += '</div>';
                 }
                 html += '</div></div></div>';
                 html += '<div class="card-footer"> <div class="d-flex justify-content-center">';
-                html += '<button type="button" class="btn-primary" id="' + item + 'sendGroup"  onclick="sendGroup(\'' + item + '\')"> Enviar Grupo</button>';
-                html += '<button type="button" class="btn-primary" id="' + item + 'sendPath"  onclick="sendPath(\'' + item + '\')"> Enviar Camino</button>';
+                html += '<button type="button" class="btn-outline-success" id="' + item + 'sendGroup"  onclick="sendGroup(\'' + item + '\')"> Enviar Grupo</button>';
+                html += '<button type="button" class="btn-outline-success" id="' + item + 'sendPath"  onclick="sendPath(\'' + item + '\')"> Enviar Camino</button>';
                 html += '</div></div></div></div>';
 
             });
@@ -988,7 +988,7 @@ function startRemoteGame() {
     $.ajax({
 
         url: endpoint + gameStart,
-        headers: { name: gameOwner, password: gamePassw },
+        headers: {password: gamePassw , name: gameOwner },
         type: "HEAD",
         dataType: "json",
         contentType: "application/json",
@@ -1059,8 +1059,8 @@ function startRemoteGame() {
             }
             html += '</div></div></div>';
             html += '<div class="card-footer"> <div class="d-flex justify-content-center">';
-            html += '<button type="button" class="btn-primary" id="' + gameOwner + 'sendGroup"  onclick="sendLocalGroup(\'' + gameOwner + '\')"> Enviar Grupo</button>';
-            html += '<button type="button" class="btn-primary" id="' + gameOwner + 'sendPath"  onclick="sendLocalPath(\'' + gameOwner + '\')"> Enviar Camino</button>';
+            html += '<button type="button" class="btn-outline-success" id="' + gameOwner + 'sendGroup"  onclick="sendLocalGroup(\'' + gameOwner + '\')"> Enviar Grupo</button>';
+            html += '<button type="button" class="btn-outline-success" id="' + gameOwner + 'sendPath"  onclick="sendLocalPath(\'' + gameOwner + '\')"> Enviar Camino</button>';
             html += '</div></div></div>';
             $('#row-remoteCardGame').html(html);
             $('#row-remoteCardGame').show();
@@ -1496,7 +1496,7 @@ function LoadGames() {
                 html += '<tr>';
                 html += '<td>' + item.id + '</td>';
                 html += '<td>' + item.name + '</td>';
-                html += '<td> <button class="btn btn-primary" id="display-JoinModal" onclick="modalJoin(\'' + item.id + '\')">Unirme</button></td>';
+                html += '<td> <button class="btn btn-outline-success" id="display-JoinModal" onclick="modalJoin(\'' + item.id + '\')">Unirme</button></td>';
 
 
                 html += '</tr>';
