@@ -15,7 +15,7 @@
     });
 
     document.getElementById("StarGame").addEventListener("click", function () {
-        startGame();
+        startGame();//local
     });
     document.getElementById("startRemoteGame").addEventListener("click", function () {
         startRemoteGame();
@@ -988,7 +988,7 @@ function startRemoteGame() {
     $.ajax({
 
         url: endpoint + gameStart,
-        headers: {password: gamePassw , name: gameOwner },
+        headers: {password: gamePassw , player: gameOwner },
         type: "HEAD",
         dataType: "json",
         contentType: "application/json",
@@ -999,10 +999,10 @@ function startRemoteGame() {
             html += '<div class="card" style="width:400px"> <div class="card-header" id="cardHead">';
             html += '<div class="d-flex justify-content-end" style="height:32px;"><button type="button" class="btn-icon" onclick="rechargeCard()"><svg xmlns = "http://www.w3.org/2000/svg" width = "16" height = "16" fill = "currentColor" class="bi bi-arrow-clockwise" viewBox = "0 0 16 16" ><path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"></path><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"></path></svg ></button ></div ><div class="d-flex justify-content-center"> <h3 id="h3' + gameOwner + '" value="' + gameOwner + '">' + gameOwner + '</h3> </div></div>';
             html += '<div class="card-body" id="card' + gameOwner + '"> <div class="flex-md-column"> <div class="container" id="player' + gameOwner + 'buttons"> ';
-            $.each(gameInfo.players, function (key, element) {
-                if (gameInfo.psychos.includes(gameOwner) == true) {
+            $.each(gameInfo.data.players, function (key, element) {
+                if (gameInfo.data.enemies.includes(gameOwner) == true) {
 
-                    if (gameInfo.psychos.includes(element) == true) {
+                    if (gameInfo.data.enemies.includes(element) == true) {
                         html += '<div class="mb-1">';
                         html += '<button type="button" class="btn-player" id="btn' + gameOwner + count + '" value="' + element + '" onclick="return getPlayer(\'' + element + '\',\'' + count + '\',\'' + gameOwner + '\')" style="color:red;width:100px">' + element + '</button>';
                         html += '</div>';
@@ -1041,7 +1041,7 @@ function startRemoteGame() {
             html += '<h5 id="' + gameOwner + 'roundGroup"></h5>';
             html += '</div>';
             html += '<div class="mb-1">';
-            if (gameInfo.psychos.includes(gameOwner) == true) {
+            if (gameInfo.data.enemies.includes(gameOwner) == true) {
 
                 html += '<h5 id="' + gameOwner + 'selectPath">Seleccione el camino seguro o inseguro</h5>';
 
@@ -1052,7 +1052,7 @@ function startRemoteGame() {
             html += '<div class="mb-1">';
             html += '<button type="button" class="btn btn-success" id="' + gameOwner + 'goodPath" onclick="goodPath()" value="Camino Seguro"> Camino Seguro</button>';
             html += '</div>';
-            if (gameInfo.psychos.includes(gameOwner) == true) {
+            if (gameInfo.data.enemies.includes(gameOwner) == true) {
                 html += '<div class="mb-1">';
                 html += '<button type="button" class="btn btn-danger" id="' + gameOwner + 'badPath" onclick="return badPath()" value="Camino Inseguro"> Camino Inseguro</button>';
                 html += '</div>';
@@ -1078,12 +1078,12 @@ function startRemoteGame() {
             $('#' + gameOwner + 'waitStartGame').hide();
             $('#' + gameOwner + 'goodPath').hide();
             $('#' + gameOwner + 'selectPath').hide();
-            if (gameInfo.psychos.includes(gameOwner) == true) {
+            if (gameInfo.data.enemies.includes(gameOwner) == true) {
                 $('#' + gameOwner + 'badPath').hide();
             }
             $('#' + gameOwner + 'roundGroup').hide();
             $('#remoteCard').removeClass('card');
-            if (gameInfo.psychos.includes(gameOwner) == true) {
+            if (gameInfo.data.enemies.includes(gameOwner) == true) {
                 $('#remoteCard').addClass('card border-danger');
                 document.getElementById('cardHead').style.background = "#ca1010";
 

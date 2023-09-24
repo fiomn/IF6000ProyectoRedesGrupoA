@@ -156,13 +156,13 @@ function rechargeRemoteCard() {
     var psychoWins = 0;
     var psychosLost = 0;
 
-    if (gameInfo.status == "rounds" || gameInfo.status == "leader") {
-        if (gameInfo.rounds.length != 0 && gameInfo.rounds.length == 1) {
+    if (gameInfo.data.status == "rounds" || gameInfo.data.status == "leader") {
+        if (gameInfo.data.rounds.length != 0 && gameInfo.data.rounds.length == 1) {
             if (cardCompleted == 0) {
                 var html1 = '';
                 var count = 0;
                 $('#remoteCard').removeClass('card');
-                if (gameInfo.psychos.includes(remoteNamePlayer) == true) {
+                if (gameInfo.data.enemies.includes(remoteNamePlayer) == true) {
                     $('#remoteCard').addClass('card border-danger');
                     document.getElementById('cardHead').style.background = "#ca1010";
 
@@ -173,11 +173,11 @@ function rechargeRemoteCard() {
 
                 }
                 document.getElementById("h3" + remoteNamePlayer).style.color = "white";
-                $.each(gameInfo.players, function (key, element) {
+                $.each(gameInfo.data.players, function (key, element) {
 
-                    if (gameInfo.psychos.includes(remoteNamePlayer) == true) {
+                    if (gameInfo.data.enemies.includes(remoteNamePlayer) == true) {
 
-                        if (gameInfo.psychos.includes(element) == true) {
+                        if (gameInfo.data.enemies.includes(element) == true) {
                             html1 += '<div class="mb-1">';
                             html1 += '<button type="button" class="btn-player" id="btn' + remoteNamePlayer + count + '" value="' + element + '" onclick="return getRemotePlayer(\'' + element + '\',\'' + count + '\',\'' + remoteNamePlayer + '\')" style="color:red;width:100px">' + element + '</button>';
                             html1 += '</div>';
@@ -200,7 +200,7 @@ function rechargeRemoteCard() {
                 });
                 $('#player' + remoteNamePlayer + 'buttons').html(html1);
                 html1 = '';
-                if (gameInfo.psychos.includes(remoteNamePlayer) == true) {
+                if (gameInfo.data.enemies.includes(remoteNamePlayer) == true) {
 
                     html1 += '<div class="mb-1">';
                     html1 += '<button type="button" class="btn btn-danger" id="' + remoteNamePlayer + 'badPath" onclick="return badRemotePath()" value="Camino Inseguro"> Camino Inseguro</button>';
@@ -219,8 +219,8 @@ function rechargeRemoteCard() {
         }
     }
 
-    gameStatus = gameInfo.status;
-    if (gameInfo.rounds.length != 0) {
+    gameStatus = gameInfo.data.status;
+    if (gameInfo.data.rounds.length != 0) {
         remoteRound = gameInfo.rounds.length - 1;
     }
     $('#player' + remoteNamePlayer + 'buttons').hide();
@@ -231,7 +231,7 @@ function rechargeRemoteCard() {
     $('#' + remoteNamePlayer + 'waitStartGame').hide();
     $('#' + remoteNamePlayer + 'goodPath').hide();
     $('#' + remoteNamePlayer + 'selectPath').hide();
-    if (gameInfo.psychos.includes(remoteNamePlayer) == true) {
+    if (gameInfo.data.enemies.includes(remoteNamePlayer) == true) {
         $('#' + remoteNamePlayer + 'badPath').hide();
     }
     $('#' + remoteNamePlayer + 'roundGroup').hide();
@@ -262,14 +262,14 @@ function rechargeRemoteCard() {
     }
     if (gameStatus == "rounds") {
         var rep = 0;
-        $.each(gameInfo.rounds[remoteRound].group, function (key, element) {
+        $.each(gameInfo.data.rounds[remoteRound].group, function (key, element) {
             if (element.name == remoteNamePlayer) {
                 if (element.psycho == null) {
                     $('#' + remoteNamePlayer + 'waitingPath').hide();
                     $('#' + remoteNamePlayer + 'sendPath').show();
                     $('#' + remoteNamePlayer + 'goodPath').show();
                     $('#' + remoteNamePlayer + 'selectPath').show();
-                    if (gameInfo.psychos.includes(remoteNamePlayer) == true) {
+                    if (gameInfo.data.enemies.includes(remoteNamePlayer) == true) {
                         $('#' + remoteNamePlayer + 'badPath').show();
                     }
                 } else {
