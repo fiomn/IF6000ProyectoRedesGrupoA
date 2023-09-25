@@ -8,7 +8,7 @@ var gameStatus = '';
 
 var verifySend = 0
 var cardCompleted = 0;
-
+var roundInfo = [];
 
 function getInfoGame() {
     return JSON.parse($.ajax({
@@ -24,17 +24,30 @@ function getInfoGame() {
     }).responseText);
 }
 
+function getRoundGame() {
+    
+    $.ajax({
+        type: 'GET',
+        url: endpoint + remoteGameId + "/rounds",
+        headers: { player: remoteNamePlayer, password: remoteGamePassword },
+        dataType: 'json',
+        success: function (resp) {
+            console.log(JSON.stringify(resp.data));
+            return roundInfo = resp.data;
+        }
+    }
+    );
+}
+
+    
 function addPlayerRemote() {
     var psychoWins = 0;
     var psychosLost = 0;
     //var gameJoin = remoteGameId + "/join"
     remoteNamePlayer = $('#user-name').val();
     remoteGamePassword = $('#passwordRemoteGame').val();
-    //remoteGamePassword = sha256(rGamePassword);
     $('#password-game').val('');
     $('#user-name').val('');
-    //alert(remoteGame);
-    //console.log(remoteNamePlayer);
     $.ajax({
 
         url: endpoint + remoteGameId,
@@ -44,6 +57,7 @@ function addPlayerRemote() {
         dataType: "json",
         contentType: "application/json",
         success: function (result) {
+            
             $('#modal-join-game').modal("hide");
             $('#gamesLobbyTable').hide();
             var html = '';
@@ -155,14 +169,16 @@ function rechargeRemoteCard() {
     var gameInfo = getInfoGame();
     var psychoWins = 0;
     var psychosLost = 0;
+    console.log("tamaño arreglo" + roundInfo.length);
+    getRoundGame();
 
-    if (gameInfo.status == "rounds" || gameInfo.status == "leader") {
-        if (gameInfo.rounds.length != 0 && gameInfo.rounds.length == 1) {
+    if (gameInfo.data.status == "rounds" || gameInfo.data.status == "leader") {
+        if (roundInfo.length >= 0 || roundInfo.length == 1) {
             if (cardCompleted == 0) {
                 var html1 = '';
                 var count = 0;
                 $('#remoteCard').removeClass('card');
-                if (gameInfo.psychos.includes(remoteNamePlayer) == true) {
+                if (gameInfo.data.enemies.includes(remoteNamePlayer) == true) {
                     $('#remoteCard').addClass('card border-danger');
                     document.getElementById('cardHead').style.background = "#ca1010";
 
@@ -173,11 +189,11 @@ function rechargeRemoteCard() {
 
                 }
                 document.getElementById("h3" + remoteNamePlayer).style.color = "white";
-                $.each(gameInfo.players, function (key, element) {
+                $.each(gameInfo.data.players, function (key, element) {
 
-                    if (gameInfo.psychos.includes(remoteNamePlayer) == true) {
+                    if (gameInfo.data.enemies.includes(remoteNamePlayer) == true) {
 
-                        if (gameInfo.psychos.includes(element) == true) {
+                        if (gameInfo.data.enemies.includes(element) == true) {
                             html1 += '<div class="mb-1">';
                             html1 += '<button type="button" class="btn-player" id="btn' + remoteNamePlayer + count + '" value="' + element + '" onclick="return getRemotePlayer(\'' + element + '\',\'' + count + '\',\'' + remoteNamePlayer + '\')" style="color:red;width:100px">' + element + '</button>';
                             html1 += '</div>';
@@ -200,7 +216,7 @@ function rechargeRemoteCard() {
                 });
                 $('#player' + remoteNamePlayer + 'buttons').html(html1);
                 html1 = '';
-                if (gameInfo.psychos.includes(remoteNamePlayer) == true) {
+                if (gameInfo.data.enemies.includes(remoteNamePlayer) == true) {
 
                     html1 += '<div class="mb-1">';
                     html1 += '<button type="button" class="btn btn-danger" id="' + remoteNamePlayer + 'badPath" onclick="return badRemotePath()" value="Camino Inseguro"> Camino Inseguro</button>';
@@ -219,9 +235,9 @@ function rechargeRemoteCard() {
         }
     }
 
-    gameStatus = gameInfo.status;
-    if (gameInfo.rounds.length != 0) {
-        remoteRound = gameInfo.rounds.length - 1;
+    gameStatus = gameInfo.data.status;
+    if (roundInfo.length != 0) {
+        remoteRound = roundInfo.length - 1;
     }
     $('#player' + remoteNamePlayer + 'buttons').hide();
     $('#' + remoteNamePlayer + 'sendPath').hide();
@@ -231,10 +247,11 @@ function rechargeRemoteCard() {
     $('#' + remoteNamePlayer + 'waitStartGame').hide();
     $('#' + remoteNamePlayer + 'goodPath').hide();
     $('#' + remoteNamePlayer + 'selectPath').hide();
-    if (gameInfo.psychos.includes(remoteNamePlayer) == true) {
+    if (gameInfo.data.enemies.includes(remoteNamePlayer) == true) {
         $('#' + remoteNamePlayer + 'badPath').hide();
     }
     $('#' + remoteNamePlayer + 'roundGroup').hide();
+    /*
     if (gameInfo.psychoWin.length != 0) {
         $.each(gameInfo.psychoWin, function (key, element) {
             if (element == false) {
@@ -244,15 +261,15 @@ function rechargeRemoteCard() {
             }
 
         });
-    }
+    }*/
     $('#PsychoScore').text(psychoWins);
     $('#ExeScore').text(psychosLost);
 
     if (gameStatus == "lobby") {
         $('#' + remoteNamePlayer + 'waitStartGame').show();
     }
-    if (gameStatus == "leader") {
-        if (gameInfo.rounds[remoteRound].leader == remoteNamePlayer) {
+    if (roundInfo[remoteRound].status == "waiting-on-leader") {
+        if (roundInfo[remoteRound].leader == remoteNamePlayer) {
             $('#player' + remoteNamePlayer + 'buttons').show();
             $('#' + remoteNamePlayer + 'sendGroup').show();
         } else {
@@ -262,14 +279,14 @@ function rechargeRemoteCard() {
     }
     if (gameStatus == "rounds") {
         var rep = 0;
-        $.each(gameInfo.rounds[remoteRound].group, function (key, element) {
-            if (element.name == remoteNamePlayer) {
-                if (element.psycho == null) {
+        $.each(roundInfo[remoteRound].group, function (key, element) {
+            if (element == remoteNamePlayer) {
+                if (true) { //element.psycho == false
                     $('#' + remoteNamePlayer + 'waitingPath').hide();
                     $('#' + remoteNamePlayer + 'sendPath').show();
                     $('#' + remoteNamePlayer + 'goodPath').show();
                     $('#' + remoteNamePlayer + 'selectPath').show();
-                    if (gameInfo.psychos.includes(remoteNamePlayer) == true) {
+                    if (gameInfo.data.enemies.includes(remoteNamePlayer) == true) {
                         $('#' + remoteNamePlayer + 'badPath').show();
                     }
                 } else {
@@ -294,17 +311,20 @@ function rechargeRemoteCard() {
     if (gameStatus == "ended") {
         clearcontent("card" + remoteNamePlayer);
         var countWin = 0;
+        /*
         $.each(gameInfo.psychoWin, function (key, element) {
             if (element == false) {
                 countWin = countWin + 1;
             }
 
         });
+        
         if (countWin == 3) {
             document.getElementById("card" + remoteNamePlayer).innerHTML = "<h4>El juego ha terminado, los ciudadanos ejemplares ganaron la partida</h4>";
         } else {
             document.getElementById("card" + remoteNamePlayer).innerHTML = "<h4>El juego ha terminado, los psicopatas ganaron la partida</h4>";
         }
+        */
         $.each(playersSelected, function (key, item) {
             playersSelected = arrayRemove(playersSelected, item);
         })
@@ -321,12 +341,12 @@ function rechargeRemoteCard() {
 function proposedRemoteGroupInfo() {
     var info = "El grupo escogido fue: ";
     var gameInfo = getInfoGame();
-    var remoteRound = gameInfo.rounds.length - 1;
-    $.each(gameInfo.rounds[remoteRound].group, function (key, element) {
-        if (key == (gameInfo.rounds[remoteRound].group.length - 1)) {
-            info += element.name;
+    var remoteRound = roundInfo.length -1;
+    $.each(roundInfo[remoteRound].group, function (key, element) {
+        if (key == (roundInfo[remoteRound].group.length - 1)) {
+            info += element;
         } else {
-            info += element.name + ' , ';
+            info += element + ' , ';
         }
     });
     return info;
@@ -446,6 +466,7 @@ function clearcontent(html) {
 function sendRemoteProposal(playerName) {
     var json = '{"group":[]}';
     var playersGroup = JSON.parse(json);
+    var gameInfo = getInfoGame();
     $.each(proposedGroup, function (key, item) {
         playersGroup.group.push(item);
     });
@@ -458,9 +479,9 @@ function sendRemoteProposal(playerName) {
     });
 
     $.ajax({
-        url: endpoint + remoteGameId + "/group",
-        headers: { name: remoteNamePlayer, password: remoteGamePassword },
-        type: "POST",
+        url: endpoint + remoteGameId + "/rounds/"+ gameInfo.data.currentRound,
+        headers: { player: remoteNamePlayer, password: remoteGamePassword },
+        type: "PATCH",
         data: JSON.stringify(playersGroup),
         dataType: "json",
         contentType: "application/json",
@@ -525,8 +546,8 @@ function sendRemoteProposal(playerName) {
 
 function sendRemoteGroup(playerName) {
     var groupInfo = getInfoGame();
-    var playerCount = groupInfo.players.length;
-    var round = groupInfo.rounds.length - 1;
+    var playerCount = groupInfo.data.players.length;
+    var round = roundInfo.length - 1;
     if (playerCount == 5) {
         if (round == 0 && proposedGroup.length == 2) {
             sendRemoteProposal(playerName);

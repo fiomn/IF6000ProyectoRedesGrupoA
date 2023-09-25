@@ -65,24 +65,25 @@ function getEndPoint() {
 function startGame() {
 
     var gameStart = gameId + "/start"
-    $('#participants-list').hide();
+    gamePassw = gamePassw;
     $.ajax({
         url: endpoint + gameStart,
         headers: { password: gamePassw, player: gameOwner },
         type: "HEAD",
         dataType: "json",
         success: function (result) {
+            $('#participants-list').hide();
             var gameInfo = getGame();
             var html = '';
             var count = 0;
-            $.each(gameInfo.players, function (key, item) {
+            $.each(gameInfo.data.players, function (key, item) {
                 html += '<div class="col-lg-4 mb-4"> <div class="card"> <div class="card-header">';
                 html += '<div class="d-flex justify-content-center"> <h3 id="h3' + item + '" value="' + item + '">' + item + '</h3> </div></div>';
                 html += '<div class="card-body" id="card' + item + '"> <div class="flex-md-column"> <div class="container" id="player' + item + 'buttons"> ';
-                $.each(gameInfo.players, function (key, element) {
+                $.each(gameInfo.data.players, function (key, element) {
 
-                    if (gameInfo.psychos.includes(item) == true) {
-                        if (gameInfo.psychos.includes(element) == true) {
+                    if (gameInfo.data.enemies.includes(item) == true) {
+                        if (gameInfo.data.enemies.includes(element) == true) {
                             html += '<div class="mb-1">';
                             html += '<button type="button" class="btn-player" id="btn' + item + count + '" value="' + element + '" onclick="return getPlayer(\'' + element + '\',\'' + count + '\',\'' + item + '\')" style="color:red;width:100px">' + element + '</button>';
                             html += '</div>';
@@ -117,7 +118,7 @@ function startGame() {
                 html += '<div class="mb-1">';
                 html += '<button type="button" class="btn-outline-success" id="' + item + 'goodPath" onclick="goodPath()" value="Camino Seguro"> Camino Seguro</button>';
                 html += '</div>';
-                if (gameInfo.psychos.includes(item) == true) {
+                if (gameInfo.data.enemies.includes(item) == true) {
                     html += '<div class="mb-1">';
                     html += '<button type="button" class="btn-outline-successy" id="' + item + 'badPath" onclick="return badPath()" value="Camino Inseguro"> Camino Inseguro</button>';
                     html += '</div>';
@@ -131,15 +132,15 @@ function startGame() {
             });
             $('#row-cardGame').html(html);
 
-            $.each(gameInfo.players, function (key, item) {
+            $.each(gameInfo.data.players, function (key, item) {
                 var player = $('#h3' + item).text();
-                if (player != gameInfo.rounds[0].leader) {
+                if (player != roundInfo.data.leader) {
                     $('#player' + item + 'buttons').hide();
                     $('#' + item + 'sendPath').hide();
                     $('#' + item + 'sendGroup').hide();
                     $('#' + item + 'waitingPath').hide();
                     $('#' + item + 'goodPath').hide();
-                    if (gameInfo.psychos.includes(item) == true) {
+                    if (gameInfo.data.enemies.includes(item) == true) {
                         $('#' + item + 'badPath').hide();
                     }
                     $('#' + item + 'roundGroup').hide();
@@ -150,7 +151,7 @@ function startGame() {
                     $('#' + item + 'waitingPath').hide();
                     $('#' + item + 'goodPath').hide();
                     $('#' + item + 'waitSelection').hide();
-                    if (gameInfo.psychos.includes(item) == true) {
+                    if (gameInfo.data.enemies.includes(item) == true) {
                         $('#' + item + 'badPath').hide();
                     }
                 }
@@ -816,6 +817,7 @@ function createGame() {
                 dataType: "json",
                 contentType: "application/json",
                 success: function (result) {
+                    console.log("funco");
                     $('#remoteParticipants-list').show();
                     //localRemoteGames
                     //$("#display-modal").hide();
@@ -830,6 +832,7 @@ function createGame() {
                 },
                 error: function (errorMessage) {
                     if (errorMessage.status == 400) {
+                        console.log("")
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
@@ -988,21 +991,22 @@ function startRemoteGame() {
     $.ajax({
 
         url: endpoint + gameStart,
-        headers: {password: gamePassw , name: gameOwner },
+        headers: {password: gamePassw , player: gameOwner },
         type: "HEAD",
         dataType: "json",
         contentType: "application/json",
         success: function (result) {
+            
             var gameInfo = getGame();
             var count = 0;
             var html = '';
             html += '<div class="card" style="width:400px"> <div class="card-header" id="cardHead">';
             html += '<div class="d-flex justify-content-end" style="height:32px;"><button type="button" class="btn-icon" onclick="rechargeCard()"><svg xmlns = "http://www.w3.org/2000/svg" width = "16" height = "16" fill = "currentColor" class="bi bi-arrow-clockwise" viewBox = "0 0 16 16" ><path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"></path><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"></path></svg ></button ></div ><div class="d-flex justify-content-center"> <h3 id="h3' + gameOwner + '" value="' + gameOwner + '">' + gameOwner + '</h3> </div></div>';
             html += '<div class="card-body" id="card' + gameOwner + '"> <div class="flex-md-column"> <div class="container" id="player' + gameOwner + 'buttons"> ';
-            $.each(gameInfo.players, function (key, element) {
-                if (gameInfo.psychos.includes(gameOwner) == true) {
+            $.each(gameInfo.data.players, function (key, element) {
+                if (gameInfo.data.enemies.includes(gameOwner) == true) {
 
-                    if (gameInfo.psychos.includes(element) == true) {
+                    if (gameInfo.data.enemies.includes(element) == true) {
                         html += '<div class="mb-1">';
                         html += '<button type="button" class="btn-player" id="btn' + gameOwner + count + '" value="' + element + '" onclick="return getPlayer(\'' + element + '\',\'' + count + '\',\'' + gameOwner + '\')" style="color:red;width:100px">' + element + '</button>';
                         html += '</div>';
@@ -1041,7 +1045,7 @@ function startRemoteGame() {
             html += '<h5 id="' + gameOwner + 'roundGroup"></h5>';
             html += '</div>';
             html += '<div class="mb-1">';
-            if (gameInfo.psychos.includes(gameOwner) == true) {
+            if (gameInfo.data.enemies.includes(gameOwner) == true) {
 
                 html += '<h5 id="' + gameOwner + 'selectPath">Seleccione el camino seguro o inseguro</h5>';
 
@@ -1052,7 +1056,7 @@ function startRemoteGame() {
             html += '<div class="mb-1">';
             html += '<button type="button" class="btn btn-success" id="' + gameOwner + 'goodPath" onclick="goodPath()" value="Camino Seguro"> Camino Seguro</button>';
             html += '</div>';
-            if (gameInfo.psychos.includes(gameOwner) == true) {
+            if (gameInfo.data.enemies.includes(gameOwner) == true) {
                 html += '<div class="mb-1">';
                 html += '<button type="button" class="btn btn-danger" id="' + gameOwner + 'badPath" onclick="return badPath()" value="Camino Inseguro"> Camino Inseguro</button>';
                 html += '</div>';
@@ -1078,12 +1082,12 @@ function startRemoteGame() {
             $('#' + gameOwner + 'waitStartGame').hide();
             $('#' + gameOwner + 'goodPath').hide();
             $('#' + gameOwner + 'selectPath').hide();
-            if (gameInfo.psychos.includes(gameOwner) == true) {
+            if (gameInfo.data.enemies.includes(gameOwner) == true) {
                 $('#' + gameOwner + 'badPath').hide();
             }
             $('#' + gameOwner + 'roundGroup').hide();
             $('#remoteCard').removeClass('card');
-            if (gameInfo.psychos.includes(gameOwner) == true) {
+            if (gameInfo.data.enemies.includes(gameOwner) == true) {
                 $('#remoteCard').addClass('card border-danger');
                 document.getElementById('cardHead').style.background = "#ca1010";
 
@@ -1172,9 +1176,9 @@ function rechargeCard() {
     var psychoWins = 0;
     var psychosLost = 0;
 
-    status = gameInfo.status;
-    if (gameInfo.rounds.length != 0) {
-        remoteRound = gameInfo.rounds.length - 1;
+    status = gameInfo.data.status;
+    if (roundInfo.length != 0) {
+        remoteRound = roundInfo.length - 1;
     }
     $('#player' + gameOwner + 'buttons').hide();
     $('#' + gameOwner + 'sendPath').hide();
@@ -1184,10 +1188,11 @@ function rechargeCard() {
     $('#' + gameOwner + 'waitStartGame').hide();
     $('#' + gameOwner + 'goodPath').hide();
     $('#' + gameOwner + 'selectPath').hide();
-    if (gameInfo.psychos.includes(gameOwner) == true) {
+    if (gameInfo.data.enemies.includes(gameOwner) == true) {
         $('#' + gameOwner + 'badPath').hide();
     }
     $('#' + gameOwner + 'roundGroup').hide();
+    /*
     if (gameInfo.psychoWin.length != 0) {
         $.each(gameInfo.psychoWin, function (key, element) {
             if (element == false) {
@@ -1198,13 +1203,14 @@ function rechargeCard() {
 
         });
     }
+    */
     $('#PsychoScore').text(psychoWins);
     $('#ExeScore').text(psychosLost);
     if (status == "lobby") {
         $('#' + gameOwner + 'waitStartGame').show();
     }
     if (status == "leader") {
-        if (gameInfo.rounds[remoteRound].leader == gameOwner) {
+        if (roundInfo[remoteRound].leader == gameOwner) {
             $('#player' + gameOwner + 'buttons').show();
             $('#' + gameOwner + 'sendGroup').show();
         } else {
@@ -1214,13 +1220,13 @@ function rechargeCard() {
     }
     if (status == "rounds") {
         var rep = 0;
-        $.each(gameInfo.rounds[remoteRound].group, function (key, element) {
-            if (element.name == gameOwner) {
-                if (element.psycho == null) {
+        $.each(roundInfo[remoteRound].group, function (key, element) {
+            if (element == gameOwner) {
+                if (true) {
                     $('#' + gameOwner + 'sendPath').show();
                     $('#' + gameOwner + 'goodPath').show();
                     $('#' + gameOwner + 'selectPath').show();
-                    if (gameInfo.psychos.includes(gameOwner) == true) {
+                    if (gameInfo.data.enemies.includes(gameOwner) == true) {
                         $('#' + gameOwner + 'badPath').show();
                     }
                 } else {
@@ -1244,12 +1250,14 @@ function rechargeCard() {
     if (status == "ended") {
         clearcontent("card" + gameOwner);
         var countWin = 0;
+        /*
         $.each(gameInfo.psychoWin, function (key, element) {
             if (element == false) {
                 countWin = countWin + 1;
             }
 
         });
+        */
         if (countWin == 3) {
             document.getElementById("card" + gameOwner).innerHTML = "<h4>El juego ha terminado, los ciudadanos ejemplares ganaron la partida</h4>";
         } else {
@@ -1348,9 +1356,9 @@ function sendLocalPath(playerName) {
 function proposedGroupInfo() {
     var info = "El grupo escogido fue: ";
     var gameInfo = getGame();
-    var remoteRound = gameInfo.rounds.length - 1;
-    $.each(gameInfo.rounds[remoteRound].group, function (key, element) {
-        if (key == (gameInfo.rounds[remoteRound].group.length - 1)) {
+    var remoteRound = roundInfo.length - 1;
+    $.each(roundInfo[remoteRound].group, function (key, element) {
+        if (key == (roundInfo[remoteRound].group.length - 1)) {
             info += element.name;
         } else {
             info += element.name + ' , ';
@@ -1362,8 +1370,8 @@ function proposedGroupInfo() {
 
 function sendLocalGroup(playerName) {
     var groupInfo = getGame();
-    var playerCount = groupInfo.players.length;
-    var round = groupInfo.rounds.length - 1;
+    var playerCount = groupInfo.data.players.length;
+    var round = roundInfo.length - 1;
     if (playerCount == 5) {
         if (round == 0 && proposedGroup.length == 2) {
             sendLocalProposal(playerName);
