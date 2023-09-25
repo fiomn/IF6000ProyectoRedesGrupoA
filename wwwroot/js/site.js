@@ -1,4 +1,4 @@
-﻿$(document).ready(function () {
+$(document).ready(function () {
     hide();
 
     document.getElementById("display-modal").addEventListener("click", function () {
@@ -1158,6 +1158,7 @@ function startRemoteGame() {
 
 }
 
+//actualiza la lista de jugadores del owner
 function recharge() {
     var infoGame = getGame();
     var $olList = $("#part-list");
@@ -1165,7 +1166,6 @@ function recharge() {
 
     $.each(infoGame.data.players, function (index, player) {
         var $li = $("<li></li>").text(player); 
-
         $olList.append($li);
     });
 }

@@ -1,4 +1,4 @@
-﻿var remoteNamePlayer;
+var remoteNamePlayer;
 var remoteGamePassword;
 var remoteGameId;
 var remotePath;
