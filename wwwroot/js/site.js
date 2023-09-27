@@ -987,7 +987,7 @@ function startRemoteGame() {
     var psychoWins = 0;
     var psychosLost = 0;
     var gameStart = gameId + "/start"
-    $('#remoteParticipants-list').hide();
+    
     $.ajax({
 
         url: endpoint + gameStart,
@@ -996,7 +996,7 @@ function startRemoteGame() {
         dataType: "json",
         contentType: "application/json",
         success: function (result) {
-            
+            $('#remoteParticipants-list').hide();
             var gameInfo = getGame();
             var count = 0;
             var html = '';
