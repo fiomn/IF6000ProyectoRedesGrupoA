@@ -1490,10 +1490,10 @@ function sendLocalGroup(playerName) {
 
 }
 
-
-function LoadGames() {
+//GET publico
+function LoadGames(pageNumber) {
     $.ajax({
-        url: endpoint,
+        url: endpoint + "?page=" + pageNumber,
         type: "GET",
         contentType: "application/json;charset=utf-8",
         dataType: "json",
@@ -1529,11 +1529,11 @@ function modalJoin(id) {
 
 function showGamesTable() {
     $('#gamesLobbyTable').show();
-    LoadGames();
+    LoadGames(1);
     $('#localRemoteGames').hide();
 }
 
 //devuelve todos los juegos del servidor
 function rechargeGames() {
-    LoadGames();
+    LoadGames(1);
 }
