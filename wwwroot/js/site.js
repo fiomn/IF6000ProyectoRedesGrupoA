@@ -1,4 +1,4 @@
-$(document).ready(function () {
+﻿$(document).ready(function () {
     hide();
 
     document.getElementById("display-modal").addEventListener("click", function () {
@@ -15,7 +15,7 @@ $(document).ready(function () {
     });
 
     document.getElementById("StarGame").addEventListener("click", function () {
-        startGame();
+        startGame();//local
     });
     document.getElementById("startRemoteGame").addEventListener("click", function () {
         startRemoteGame();
@@ -57,6 +57,7 @@ var psychoLost = 0;
 var remotePlayersQ = 0;
 var verifyLocalSend = 0
 var status;
+var roundInfoLocalLocal = [];
 
 function getEndPoint() {
     return endpoint;
@@ -134,7 +135,7 @@ function startGame() {
 
             $.each(gameInfo.data.players, function (key, item) {
                 var player = $('#h3' + item).text();
-                if (player != roundInfo.data.leader) {
+                if (player != roundInfoLocal.data.leader) {
                     $('#player' + item + 'buttons').hide();
                     $('#' + item + 'sendPath').hide();
                     $('#' + item + 'sendGroup').hide();
@@ -218,6 +219,7 @@ function startGame() {
         }
     });
 }
+
 
 function hide() {
     $('#game-score').hide();
@@ -667,6 +669,7 @@ function getGame() {
         global: false,
         async: false,
         success: function (data) {
+            
             return data;
         }
     }).responseText);
@@ -817,7 +820,7 @@ function createGame() {
                 dataType: "json",
                 contentType: "application/json",
                 success: function (result) {
-                    console.log("funco");
+                    //console.log("funco");
                     $('#remoteParticipants-list').show();
                     //localRemoteGames
                     //$("#display-modal").hide();
@@ -907,6 +910,7 @@ function changeEndpoint() {
 function sendLocalProposal(playerName) {
     var json = '{"group":[]}';
     var playersGroup = JSON.parse(json);
+    var gameInfo = getGame();
     $.each(proposedGroup, function (key, item) {
         playersGroup.group.push(item);
     })
@@ -919,9 +923,9 @@ function sendLocalProposal(playerName) {
     })
 
     $.ajax({
-        url: endpoint + gameId + "/group",
-        headers: { name: gameOwner, password: gamePassw },
-        type: "POST",
+        url: endpoint + gameId + "/rounds/" + gameInfo.data.currentRound,
+        headers: { player: gameOwner, password: gamePassw },
+        type: "PATCH",
         data: JSON.stringify(playersGroup),
         dataType: "json",
         contentType: "application/json",
@@ -1158,6 +1162,29 @@ function startRemoteGame() {
 
 }
 
+function getRoundGame() {
+    console.log("entro");
+    var roundId = gameId + "/rounds";
+    $.ajax({
+        type: 'GET',
+        url: endpoint + roundId,
+        headers: { player: gameOwner, password: gamePassw },
+        dataType: 'json',
+        global: false,
+        async: false,
+        success: function (resp) {
+            console.log(JSON.stringify(resp.data));
+            return roundInfoLocalLocal = resp.data;
+        },
+        error: function (ex) {
+            console.log(ex);
+        }
+    }
+    );
+
+}
+
+
 //actualiza la lista de jugadores del owner
 function recharge() {
     var infoGame = getGame();
@@ -1171,14 +1198,36 @@ function recharge() {
 }
 
 function rechargeCard() {
+
     var gameInfo = getGame();
     var remoteRound = 0;
     var psychoWins = 0;
     var psychosLost = 0;
+    //console.log(gameId + " " + gameOwner + " " + gamePassw);
+
+    //  Me vale picha, esta mierda no servia fuera en un metodo, que se vaya a la mierda
+
+    var roundId = gameId + "/rounds";
+    $.ajax({
+        type: 'GET',
+        url: endpoint + roundId,
+        headers: { player: gameOwner, password: gamePassw },
+        dataType: 'json',
+        global: false,
+        async: false,
+        success: function (resp) {
+            console.log(JSON.stringify(resp.data));
+            roundInfoLocal = resp.data;
+        },
+        error: function (ex) {
+            console.log(ex);
+        }
+    }
+    );
 
     status = gameInfo.data.status;
-    if (roundInfo.length != 0) {
-        remoteRound = roundInfo.length - 1;
+    if (roundInfoLocal.length != 0) {
+        remoteRound = roundInfoLocal.length - 1;
     }
     $('#player' + gameOwner + 'buttons').hide();
     $('#' + gameOwner + 'sendPath').hide();
@@ -1209,8 +1258,8 @@ function rechargeCard() {
     if (status == "lobby") {
         $('#' + gameOwner + 'waitStartGame').show();
     }
-    if (status == "leader") {
-        if (roundInfo[remoteRound].leader == gameOwner) {
+    if (roundInfoLocal[remoteRound].status == "waiting-on-leader") {
+        if (roundInfoLocal[remoteRound].leader == gameOwner) {
             $('#player' + gameOwner + 'buttons').show();
             $('#' + gameOwner + 'sendGroup').show();
         } else {
@@ -1218,9 +1267,9 @@ function rechargeCard() {
         }
         verifyLocalSend = 0;
     }
-    if (status == "rounds") {
+    if (roundInfoLocal[remoteRound].status == "voting") {
         var rep = 0;
-        $.each(roundInfo[remoteRound].group, function (key, element) {
+        $.each(roundInfoLocal[remoteRound].group, function (key, element) {
             if (element == gameOwner) {
                 if (true) {
                     $('#' + gameOwner + 'sendPath').show();
@@ -1277,10 +1326,10 @@ function rechargeCard() {
 function sendLocalPath(playerName) {
     if (path != null) {
         $.ajax({
-            url: endpoint + gameId + "/go",
-            headers: { name: playerName, password: gamePassw },
-            type: "POST",
-            data: JSON.stringify({ psycho: path }),
+            url: endpoint + gameId + "/rounds/" + roundInfoLocal[roundInfo.length - 1].id,
+            headers: { player: playerName, password: gamePassw },
+            type: "PUT",
+            data: JSON.stringify({ action: path }),
             dataType: "json",
             contentType: "application/json",
             success: function (result) {
@@ -1356,12 +1405,12 @@ function sendLocalPath(playerName) {
 function proposedGroupInfo() {
     var info = "El grupo escogido fue: ";
     var gameInfo = getGame();
-    var remoteRound = roundInfo.length - 1;
-    $.each(roundInfo[remoteRound].group, function (key, element) {
-        if (key == (roundInfo[remoteRound].group.length - 1)) {
-            info += element.name;
+    var remoteRound = roundInfoLocal.length - 1;
+    $.each(roundInfoLocal[remoteRound].group, function (key, element) {
+        if (key == (roundInfoLocal[remoteRound].group.length - 1)) {
+            info += element;
         } else {
-            info += element.name + ' , ';
+            info += element + ' , ';
         }
     });
     return info;
@@ -1371,7 +1420,7 @@ function proposedGroupInfo() {
 function sendLocalGroup(playerName) {
     var groupInfo = getGame();
     var playerCount = groupInfo.data.players.length;
-    var round = roundInfo.length - 1;
+    var round = roundInfoLocal.length - 1;
     if (playerCount == 5) {
         if (round == 0 && proposedGroup.length == 2) {
             sendLocalProposal(playerName);
@@ -1493,7 +1542,7 @@ function sendLocalGroup(playerName) {
 //GET publico
 function LoadGames(pageNumber) {
     $.ajax({
-        url: endpoint + "?page=" + pageNumber,
+        url: endpoint + "?page=" + (pageNumber-1),
         type: "GET",
         contentType: "application/json;charset=utf-8",
         dataType: "json",

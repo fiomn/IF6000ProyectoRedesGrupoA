@@ -2,6 +2,7 @@ var remoteNamePlayer;
 var remoteGamePassword;
 var remoteGameId;
 var remotePath;
+var remoteVote;
 var remoteRound = 0;
 
 var gameStatus = '';
@@ -24,7 +25,7 @@ function getInfoGame() {
     }).responseText);
 }
 
-function getRoundGame() {
+function getRoundGameRemote() {
     
     $.ajax({
         type: 'GET',
@@ -85,8 +86,11 @@ function addPlayerRemote() {
 
             html += '</div></div></div>';
             html += '<div class="card-footer"> <div class="d-flex justify-content-center">';
+            //submits
             html += '<button type="button" class="btn-outline-success" id="' + remoteNamePlayer + 'sendGroup"  onclick="sendRemoteGroup(\'' + remoteNamePlayer + '\')"> Enviar Grupo</button>';
             html += '<button type="button" class="btn-outline-success" id="' + remoteNamePlayer + 'sendPath"  onclick="sendRemotePath(\'' + remoteNamePlayer + '\')"> Enviar Camino</button>';
+            html += '<button type="button" class="btn-outline-success" id="' + remoteNamePlayer + 'sendVote"  onclick="sendRemoteVote(\'' + remoteNamePlayer + '\')"> Enviar Voto</button>';
+
             html += '</div></div></div>';
             $('#row-remoteCardGame').html(html);
             $('#PsychoScore').text(psychoWins);
@@ -94,8 +98,11 @@ function addPlayerRemote() {
             $('#game-score').show();
 
             $('#player' + remoteNamePlayer + 'buttons').hide();
+            //hiding submits
             $('#' + remoteNamePlayer + 'sendPath').hide();
             $('#' + remoteNamePlayer + 'sendGroup').hide();
+            $('#' + remoteNamePlayer + 'sendVote').hide();
+
             $('#' + remoteNamePlayer + 'waitingPath').hide();
             $('#' + remoteNamePlayer + 'waitSelection').hide();
             $('#' + remoteNamePlayer + 'waitStartGame').hide();
@@ -169,8 +176,8 @@ function rechargeRemoteCard() {
     var gameInfo = getInfoGame();
     var psychoWins = 0;
     var psychosLost = 0;
-    console.log("tamaño arreglo" + roundInfo.length);
-    getRoundGame();
+    //console.log("tamaño arreglo" + roundInfo.length);
+    getRoundGameRemote();
 
     if (gameInfo.data.status == "rounds" || gameInfo.data.status == "leader") {
         if (roundInfo.length >= 0 || roundInfo.length == 1) {
@@ -191,6 +198,7 @@ function rechargeRemoteCard() {
                 document.getElementById("h3" + remoteNamePlayer).style.color = "white";
                 $.each(gameInfo.data.players, function (key, element) {
 
+                    //si es enemigo los botones indican quien es psyco
                     if (gameInfo.data.enemies.includes(remoteNamePlayer) == true) {
 
                         if (gameInfo.data.enemies.includes(element) == true) {
@@ -206,7 +214,7 @@ function rechargeRemoteCard() {
                             count = count + 1;
                         }
 
-                    } else {
+                    } else { //si es aliado, no se hace ninguna indicacion
                         html1 += '<div class="mb-1">';
                         html1 += '<button type="button" class="btn-player" id="btn' + remoteNamePlayer + count + '" value="' + element + '" onclick="return getRemotePlayer(\'' + element + '\',\'' + count + '\',\'' + remoteNamePlayer + '\')" style="width:100px;">' + element + '</button>';
                         html1 += '</div>';
@@ -235,6 +243,15 @@ function rechargeRemoteCard() {
         }
     }
 
+
+    html1 += '<div class="mb-1">';
+    html1 += '<button type="button" class="btn-player" id="btn' + remoteNamePlayer + 'acceptVote" onclick="return acceptGroupVote()" value="Aceptar"> Aceptar</button>';
+    html1 += '</div>';
+    html1 += '<div class="mb-1">';
+    html1 += '<button type="button" class="btn-player" id="btn' + remoteNamePlayer + 'deniedVote" onclick="return deniedGroupVote()" value="No aceptar"> No aceptar</button>';
+    html1 += '</div>';
+
+
     gameStatus = gameInfo.data.status;
     if (roundInfo.length != 0) {
         remoteRound = roundInfo.length - 1;
@@ -243,6 +260,9 @@ function rechargeRemoteCard() {
     $('#' + remoteNamePlayer + 'sendPath').hide();
     $('#' + remoteNamePlayer + 'sendGroup').hide();
     $('#' + remoteNamePlayer + 'waitingPath').hide();
+    //esconder botones para votar grupo
+    $('#' + remoteNamePlayer + 'acceptVote').hide();
+    $('#' + remoteNamePlayer + 'deniedVote').hide();
     $('#' + remoteNamePlayer + 'waitSelection').hide();
     $('#' + remoteNamePlayer + 'waitStartGame').hide();
     $('#' + remoteNamePlayer + 'goodPath').hide();
@@ -349,16 +369,105 @@ function proposedRemoteGroupInfo() {
             info += element + ' , ';
         }
     });
+    //mostrar votacion
+    if(roundInfo[remoteRound].status == "voting"){
+        $('#' + remoteNamePlayer + 'acceptVote').show();
+        $('#' + remoteNamePlayer + 'deniedVote').show();
+    }
     return info;
 }
 
+function sendRemoteVote(playerName) {
+    
+    if (remoteVote != null) {
+        $.ajax({
+            url: endpoint + remoteGameId + "/rounds/" + roundInfo[roundInfo.length - 1].id,
+            headers: { player: playerName, password: remoteGamePassword },
+            type: "POST",
+            data: JSON.stringify({ vote: remotePath }),
+            dataType: "json",
+            contentType: "application/json",
+            success: function (result) {
+                //verifySend = 1;
+                remotePath = null;
+                rechargeRemoteCard();
+            },
+            error: function (errorMessage) {
+                if (errorMessage.status == 401) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'La contraseña es incorrecta',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+
+                }
+                if (errorMessage.status == 403) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No eres parte de la lista de jugadores',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+
+                }
+                if (errorMessage.status == 404) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'El id del juego es inválido',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+
+                }
+                if (errorMessage.status == 406) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'La información provista es incorrecta',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+
+                }
+                if (errorMessage.status == 409) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Ya se añadio un grupo al juego',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+
+                }
+
+            }
+        });
+    } else {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Debe seleccionar un camino',
+            showConfirmButton: false,
+            timer: 1800
+        });
+    }
+
+}
+
+
+
 function sendRemotePath(playerName) {
+    console.log("antes:"+remote)
     if (remotePath != null) {
         $.ajax({
-            url: endpoint + remoteGameId + "/go",
-            headers: { name: playerName, password: remoteGamePassword },
-            type: "POST",
-            data: JSON.stringify({ psycho: remotePath }),
+            url: endpoint + remoteGameId + "/rounds/" + roundInfo[roundInfo.length-1].id,
+            headers: { player: playerName, password: remoteGamePassword },
+            type: "PUT",
+            data: JSON.stringify({ action: remotePath }),
             dataType: "json",
             contentType: "application/json",
             success: function (result) {
@@ -457,6 +566,15 @@ function goodRemotePath() {
 function badRemotePath() {
     remotePath = true;
 }
+
+function acceptGroupVote() {
+    remoteVote = true;
+}
+function deniedGroupVote() {
+    remoteVote = false;
+}
+
+
 function clearcontent(html) {
     document.getElementById(html).innerHTML = "";
 }
