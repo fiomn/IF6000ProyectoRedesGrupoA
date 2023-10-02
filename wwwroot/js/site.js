@@ -68,9 +68,9 @@ var enemieScoreLocal = 0;
 var status;
 var roundInfoLocalLocal = [];
 
-function getEndPoint() {
-    return endpoint;
-}
+//function getEndPoint() {
+//    return endpoint;
+//}
 
 function startGame() {
 
@@ -240,6 +240,7 @@ function hide() {
     $('#remoteParticipants-list').hide();
     $('#row-remoteCardGame').hide();
     $('#gamesLobbyTable').hide();
+    $('#localC').hide();
 }
 
 function getPlayer(namePlayer, count, leaderName) {
@@ -272,7 +273,6 @@ function clearcontent(html) {
 }
 
 function arrayRemove(arr, value) {
-
     return arr.filter(function (ele) {
         return ele != value;
     });
@@ -680,7 +680,7 @@ function getGame() {
         global: false,
         async: false,
         success: function (data) {
-            
+
             return data;
         }
     }).responseText);
@@ -1005,11 +1005,11 @@ function startRemoteGame() {
     var psychoWins = 0;
     var psychosLost = 0;
     var gameStart = gameId + "/start"
-    
+
     $.ajax({
 
         url: endpoint + gameStart,
-        headers: {password: gamePassw , player: gameOwner },
+        headers: { password: gamePassw, player: gameOwner },
         type: "HEAD",
         dataType: "json",
         contentType: "application/json",
@@ -1227,7 +1227,7 @@ function recharge() {
     $olList.empty();
 
     $.each(infoGame.data.players, function (index, player) {
-        var $li = $("<li></li>").text(player); 
+        var $li = $("<li></li>").text(player);
         $olList.append($li);
     });
 }
@@ -1305,7 +1305,7 @@ function rechargeCard() {
     }
 
     roundStateLocal = roundInfoLocal.length;
-    
+
     if (roundInfoLocal.length != 0) {
         remoteRound = findRoundLocal(roundInfoLocal);
         //console.log("ronda" + JSON.stringify(roundInfoLocal[remoteRound]));
@@ -1329,7 +1329,7 @@ function rechargeCard() {
     }
 
     //el juego ha empezado
-    if (status == "rounds") { 
+    if (status == "rounds") {
 
         if (roundInfoLocal[remoteRound].status == "waiting-on-group") {
             //var rep = 0;
@@ -1363,7 +1363,8 @@ function rechargeCard() {
 
         votePhase = roundInfoLocal[remoteRound].phase;
 
-        //console.log("aqui");
+        // ARREGLAR ACOMODO DE BOTONES CON INFO
+        //mostrar votacion
         if (roundInfoLocal[remoteRound].status == "voting" && alreadyVoteLocal == false) {
             var info = proposedGroupInfo();
             $('#' + gameOwner + 'roundGroup').text(info);
@@ -1371,6 +1372,7 @@ function rechargeCard() {
             $('#' + gameOwner + 'acceptVoteLocal').show();
             $('#' + gameOwner + 'deniedVoteLocal').show();
             $('#' + gameOwner + 'sendVote').show();
+            
         } else if (roundInfoLocal[remoteRound].status == "voting" && alreadyVoteLocal == true) {
             $('#' + gameOwner + 'waitVote').show();
         }
@@ -1391,7 +1393,7 @@ function rechargeCard() {
         } else if (enemieScore == 3) {
             document.getElementById("card" + gameOwner).innerHTML = "<h4>El juego ha terminado, los psicopatas ganaron la partida</h4>";
         }
-       
+
         $.each(playersSelected, function (key, item) {
             playersSelected = arrayRemove(playersSelected, item);
         })
@@ -1450,7 +1452,7 @@ function sendLocalVote(playerName) {
             success: function (result) {
                 //verifySend = 1;
                 //remotePath = null;
-                alreadyVoteLocal= true;
+                alreadyVoteLocal = true;
                 rechargeCard();
             },
             error: function (errorMessage) {
@@ -1738,7 +1740,7 @@ function sendLocalGroup(playerName) {
 //GET publico
 function LoadGames(pageNumber) {
     $.ajax({
-        url: endpoint + "?page=" + (pageNumber-1),
+        url: endpoint + "?page=" + (pageNumber),
         type: "GET",
         contentType: "application/json;charset=utf-8",
         dataType: "json",
@@ -1778,7 +1780,7 @@ function showGamesTable() {
     $('#localRemoteGames').hide();
 }
 
-//devuelve todos los juegos del servidor
+//devuelve todos los juegos del servidor por page
 function rechargeGames() {
     LoadGames(1);
 }
