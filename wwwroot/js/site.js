@@ -18,7 +18,7 @@
         startGame();//local
     });
     document.getElementById("startRemoteGame").addEventListener("click", function () {
-        startRemoteGame();
+        startRemoteGame();//remote
     });
 
     document.getElementById("localGame-btn").addEventListener("click", function () {
@@ -56,6 +56,15 @@ var psychoWin = 0;
 var psychoLost = 0;
 var remotePlayersQ = 0;
 var verifyLocalSend = 0
+//voting
+var alreadyVoteLocal = false;
+var roundStateLocal = 1;
+var votePhase;
+
+//scores
+var citizenScoreLocal = 0;
+var enemieScoreLocal = 0;
+
 var status;
 var roundInfoLocalLocal = [];
 
@@ -126,8 +135,10 @@ function startGame() {
                 }
                 html += '</div></div></div>';
                 html += '<div class="card-footer"> <div class="d-flex justify-content-center">';
+                //submits
                 html += '<button type="button" class="btn-outline-success" id="' + item + 'sendGroup"  onclick="sendGroup(\'' + item + '\')"> Enviar Grupo</button>';
                 html += '<button type="button" class="btn-outline-success" id="' + item + 'sendPath"  onclick="sendPath(\'' + item + '\')"> Enviar Camino</button>';
+
                 html += '</div></div></div></div>';
 
             });
@@ -251,10 +262,10 @@ function getPlayer(namePlayer, count, leaderName) {
 }
 
 function goodPath() {
-    path = false;
+    path = true;
 }
 function badPath() {
-    path = true;
+    path = false;
 }
 function clearcontent(html) {
     document.getElementById(html).innerHTML = "";
@@ -835,7 +846,7 @@ function createGame() {
                 },
                 error: function (errorMessage) {
                     if (errorMessage.status == 400) {
-                        console.log("")
+                        //console.log("")
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
@@ -865,7 +876,7 @@ function createGame() {
     }
 }
 
-function rechargePartList() {
+function rechargePartListLocal() {
     var gameInfo = getGame();
     var html = '';
     $.each(gameInfo.data.players, function (key, element) {
@@ -987,6 +998,9 @@ function sendLocalProposal(playerName) {
         }
     });
 }
+
+
+//este es el metodo usado para iniciar el juego y generar elementos en el juego
 function startRemoteGame() {
     var psychoWins = 0;
     var psychosLost = 0;
@@ -1046,6 +1060,16 @@ function startRemoteGame() {
             html += '<h5 id="' + gameOwner + 'waitStartGame">Esperando que la partida inicie</h5>';
             html += '</div>';
             html += '<div class="mb-1">';
+            html += '<button type="button" class="btn btn-success" id="' + gameOwner + 'acceptVoteLocal" onclick="return acceptGroupVoteLocal()" value="Aceptar"> Aceptar</button>';
+            html += '</div>';
+            html += '<div class="mb-1">';
+            html += '<button type="button" class="btn btn-danger" id="' + gameOwner + 'deniedVoteLocal" onclick="return deniedGroupVoteLocal()" value="No aceptar"> No aceptar</button>';
+            html += '</div>';
+            html += '<div class="mb-1">';
+            //esperando votos
+            html += '<h5 id="' + gameOwner + 'waitVote">Esperando los otros votos</h5>';
+            html += '</div>';
+            html += '<div class="mb-1">';
             html += '<h5 id="' + gameOwner + 'roundGroup"></h5>';
             html += '</div>';
             html += '<div class="mb-1">';
@@ -1067,9 +1091,12 @@ function startRemoteGame() {
             }
             html += '</div></div></div>';
             html += '<div class="card-footer"> <div class="d-flex justify-content-center">';
+            //submits
             html += '<button type="button" class="btn-outline-success" id="' + gameOwner + 'sendGroup"  onclick="sendLocalGroup(\'' + gameOwner + '\')"> Enviar Grupo</button>';
             html += '<button type="button" class="btn-outline-success" id="' + gameOwner + 'sendPath"  onclick="sendLocalPath(\'' + gameOwner + '\')"> Enviar Camino</button>';
+            html += '<button type="button" class="btn-outline-success" id="' + gameOwner + 'sendVote"  onclick="sendLocalVote(\'' + gameOwner + '\')"> Enviar Voto</button>';
             html += '</div></div></div>';
+
             $('#row-remoteCardGame').html(html);
             $('#row-remoteCardGame').show();
             $('#PsychoScore').text(psychoWins);
@@ -1078,12 +1105,20 @@ function startRemoteGame() {
             $('#remoteCard').removeClass('card');
 
 
+            //hiding vote buttons
+            $('#' + gameOwner + 'acceptVoteLocal').hide();
+            $('#' + gameOwner + 'deniedVoteLocal').hide();
+
+
             $('#player' + gameOwner + 'buttons').hide();
+            //hiding submits
             $('#' + gameOwner + 'sendPath').hide();
             $('#' + gameOwner + 'sendGroup').hide();
+            $('#' + gameOwner + 'sendVote').hide();
             $('#' + gameOwner + 'waitingPath').hide();
             $('#' + gameOwner + 'waitSelection').hide();
             $('#' + gameOwner + 'waitStartGame').hide();
+            $('#' + gameOwner + 'waitVote').hide();
             $('#' + gameOwner + 'goodPath').hide();
             $('#' + gameOwner + 'selectPath').hide();
             if (gameInfo.data.enemies.includes(gameOwner) == true) {
@@ -1163,7 +1198,7 @@ function startRemoteGame() {
 }
 
 function getRoundGame() {
-    console.log("entro");
+    //console.log("entro");
     var roundId = gameId + "/rounds";
     $.ajax({
         type: 'GET',
@@ -1225,10 +1260,6 @@ function rechargeCard() {
     }
     );
 
-    status = gameInfo.data.status;
-    if (roundInfoLocal.length != 0) {
-        remoteRound = roundInfoLocal.length - 1;
-    }
     $('#player' + gameOwner + 'buttons').hide();
     $('#' + gameOwner + 'sendPath').hide();
     $('#' + gameOwner + 'sendGroup').hide();
@@ -1237,6 +1268,13 @@ function rechargeCard() {
     $('#' + gameOwner + 'waitStartGame').hide();
     $('#' + gameOwner + 'goodPath').hide();
     $('#' + gameOwner + 'selectPath').hide();
+    $('#' + gameOwner + 'acceptVoteLocal').hide();
+    $('#' + gameOwner + 'deniedVoteLocal').hide();
+    $('#' + gameOwner + 'sendVote').hide();
+    $('#' + gameOwner + 'waitVote').hide();
+
+
+
     if (gameInfo.data.enemies.includes(gameOwner) == true) {
         $('#' + gameOwner + 'badPath').hide();
     }
@@ -1255,9 +1293,31 @@ function rechargeCard() {
     */
     $('#PsychoScore').text(psychoWins);
     $('#ExeScore').text(psychosLost);
+
+    findScore(roundInfoLocal);
+
+    status = gameInfo.data.status;
+
+
+    //logica que controla el paso de ronga para las votaciones y elecciones
+    if (roundStateLocal != roundInfoLocal.length) {
+        alreadyVoteLocal = false;
+    }
+
+    roundStateLocal = roundInfoLocal.length;
+    
+    if (roundInfoLocal.length != 0) {
+        remoteRound = findRoundLocal(roundInfoLocal);
+        //console.log("ronda" + JSON.stringify(roundInfoLocal[remoteRound]));
+    }
+
+
     if (status == "lobby") {
         $('#' + gameOwner + 'waitStartGame').show();
     }
+
+
+
     if (roundInfoLocal[remoteRound].status == "waiting-on-leader") {
         if (roundInfoLocal[remoteRound].leader == gameOwner) {
             $('#player' + gameOwner + 'buttons').show();
@@ -1267,16 +1327,26 @@ function rechargeCard() {
         }
         verifyLocalSend = 0;
     }
-    if (roundInfoLocal[remoteRound].status == "voting") {
-        var rep = 0;
-        $.each(roundInfoLocal[remoteRound].group, function (key, element) {
-            if (element == gameOwner) {
-                if (true) {
-                    $('#' + gameOwner + 'sendPath').show();
-                    $('#' + gameOwner + 'goodPath').show();
-                    $('#' + gameOwner + 'selectPath').show();
-                    if (gameInfo.data.enemies.includes(gameOwner) == true) {
-                        $('#' + gameOwner + 'badPath').show();
+
+    //el juego ha empezado
+    if (status == "rounds") { 
+
+        if (roundInfoLocal[remoteRound].status == "waiting-on-group") {
+            //var rep = 0;
+            $.each(roundInfoLocal[remoteRound].group, function (key, element) {
+                if (element == gameOwner) {
+                    if (true) {
+                        $('#' + gameOwner + 'sendPath').show();
+                        $('#' + gameOwner + 'goodPath').show();
+                        $('#' + gameOwner + 'selectPath').show();
+                        if (gameInfo.data.enemies.includes(gameOwner) == true) {
+                            $('#' + gameOwner + 'badPath').show();
+                        }
+                    } else {
+                        $('#' + gameOwner + 'waitingPath').show();
+                        var info = proposedGroupInfo();
+                        $('#' + gameOwner + 'roundGroup').text(info);
+                        $('#' + gameOwner + 'roundGroup').show();
                     }
                 } else {
                     $('#' + gameOwner + 'waitingPath').show();
@@ -1285,16 +1355,25 @@ function rechargeCard() {
                     $('#' + gameOwner + 'roundGroup').show();
                 }
 
+            });
+        }
+        if (votePhase != null && votePhase != roundInfoLocal[remoteRound].phase) {
+            alreadyVoteLocal = false;
+        }
 
-            } else {
-                $('#' + gameOwner + 'waitingPath').show();
-                var info = proposedGroupInfo();
-                $('#' + gameOwner + 'roundGroup').text(info);
-                $('#' + gameOwner + 'roundGroup').show();
-            }
+        votePhase = roundInfoLocal[remoteRound].phase;
 
-        });
-
+        //console.log("aqui");
+        if (roundInfoLocal[remoteRound].status == "voting" && alreadyVoteLocal == false) {
+            var info = proposedGroupInfo();
+            $('#' + gameOwner + 'roundGroup').text(info);
+            $('#' + gameOwner + 'roundGroup').show();
+            $('#' + gameOwner + 'acceptVoteLocal').show();
+            $('#' + gameOwner + 'deniedVoteLocal').show();
+            $('#' + gameOwner + 'sendVote').show();
+        } else if (roundInfoLocal[remoteRound].status == "voting" && alreadyVoteLocal == true) {
+            $('#' + gameOwner + 'waitVote').show();
+        }
     }
     if (status == "ended") {
         clearcontent("card" + gameOwner);
@@ -1306,12 +1385,13 @@ function rechargeCard() {
             }
 
         });
-        */
-        if (countWin == 3) {
+         */
+        if (citizenScore == 3) {
             document.getElementById("card" + gameOwner).innerHTML = "<h4>El juego ha terminado, los ciudadanos ejemplares ganaron la partida</h4>";
-        } else {
+        } else if (enemieScore == 3) {
             document.getElementById("card" + gameOwner).innerHTML = "<h4>El juego ha terminado, los psicopatas ganaron la partida</h4>";
         }
+       
         $.each(playersSelected, function (key, item) {
             playersSelected = arrayRemove(playersSelected, item);
         })
@@ -1320,6 +1400,122 @@ function rechargeCard() {
         })
     }
 
+
+}
+
+function findScore(roundInfoLocal) {
+
+    for (let i = 0; i < roundInfoLocal.length; i++) {
+        if (roundInfoLocal[i].result == "enemies") {
+            enemieScoreLocal = + 1;
+        } else if (roundInfoLocal[i].result == "citizens") {
+            citizenScoreLocal = + 1;
+        }
+    }
+
+    // Obtén la etiqueta por su ID
+    var enemieScoreL = document.getElementById("PsychoScore");
+
+    // Actualiza el texto utilizando textContent
+    enemieScoreL.textContent = enemieScore.toString();
+
+
+    var citizenScoreL = document.getElementById("ExeScore");
+
+    // Actualiza el texto utilizando textContent
+    citizenScoreL.textContent = citizenScore.toString();
+
+
+}
+
+function findRoundLocal(rounds) {
+    for (let i = 0; i < rounds.length; i++) {
+        if (rounds[i].status != "ended") {
+            return i; // Retorna la posición del objeto con la clave buscada
+        }
+    }
+    return -1;
+}
+
+function sendLocalVote(playerName) {
+    var localRound = findRound(roundInfoLocal);
+    if (LocalVote != null) {
+        $.ajax({
+            url: endpoint + gameId + "/rounds/" + roundInfoLocal[localRound].id,
+            headers: { player: playerName, password: gamePassw },
+            type: "POST",
+            data: JSON.stringify({ vote: LocalVote }),
+            dataType: "json",
+            contentType: "application/json",
+            success: function (result) {
+                //verifySend = 1;
+                //remotePath = null;
+                alreadyVoteLocal= true;
+                rechargeCard();
+            },
+            error: function (errorMessage) {
+                if (errorMessage.status == 401) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'La contraseña es incorrecta',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+
+                }
+                if (errorMessage.status == 403) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No eres parte de la lista de jugadores',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+
+                }
+                if (errorMessage.status == 404) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'El id del juego es inválido',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+
+                }
+                if (errorMessage.status == 406) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'La información provista es incorrecta',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+
+                }
+                if (errorMessage.status == 409) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Ya se añadio un grupo al juego',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+
+                }
+
+            }
+        });
+    } else {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Debe seleccionar un camino',
+            showConfirmButton: false,
+            timer: 1800
+        });
+    }
 
 }
 
@@ -1405,7 +1601,7 @@ function sendLocalPath(playerName) {
 function proposedGroupInfo() {
     var info = "El grupo escogido fue: ";
     var gameInfo = getGame();
-    var remoteRound = roundInfoLocal.length - 1;
+    var remoteRound = findRoundLocal(roundInfoLocal);
     $.each(roundInfoLocal[remoteRound].group, function (key, element) {
         if (key == (roundInfoLocal[remoteRound].group.length - 1)) {
             info += element;
@@ -1585,4 +1781,11 @@ function showGamesTable() {
 //devuelve todos los juegos del servidor
 function rechargeGames() {
     LoadGames(1);
+}
+
+function acceptGroupVoteLocal() {
+    LocalVote = true;
+}
+function deniedGroupVoteLocal() {
+    LocalVote = false;
 }
