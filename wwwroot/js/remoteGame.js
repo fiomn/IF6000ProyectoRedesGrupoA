@@ -2,18 +2,18 @@ var remoteNamePlayer;
 var remoteGamePassword;
 var remoteGameId;
 var remotePath;
-var remoteVote;
 var remoteRound = 0;
 
 var gameStatus = '';
 
-
 var cardCompleted = 0;
+
 //voting
 var alreadyVoteRemote = false;
 var roundState = 1;
 var votePhaseRemote;
 var alreadyProposalRemote = false;
+var remoteVote;
 
 //proposedGroup verify
 var verifySend = 0
@@ -141,6 +141,27 @@ function addPlayerRemote() {
 
         },
         error: function (errorMessage) {
+            if (errorMessage.status == 400) {
+                
+                if (errorMessage.msg == "Invalid password format") {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Formato de la contraseña invalido',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+                }else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Falta contraseña o nombre de usuario',
+                    showConfirmButton: false,
+                    timer: 1800
+                });
+                }
+             
+            }
             if (errorMessage.status == 401) {
                 Swal.fire({
                     icon: 'error',
@@ -449,7 +470,11 @@ function findScore(roundInfo) {
     // Actualiza el texto utilizando textContent
     citizenScoreL.textContent = citizenScore.toString();
 
-
+    //Actualiza contador de Decada
+    // Obtén la etiqueta por su ID
+    var decadeCountL = document.getElementById("DecadeCount");
+    // Actualiza el texto utilizando textContent
+    decadeCountL.textContent = roundInfo.length.toString();
 }
 
 
@@ -460,7 +485,7 @@ function findRound(rounds) {
             return i; // Retorna la posición del objeto con la clave buscada
         }
     }
-    return -1;
+    return rounds.length -1;
 }
     function proposedRemoteGroupInfo() {
         var info = "El grupo escogido fue: ";

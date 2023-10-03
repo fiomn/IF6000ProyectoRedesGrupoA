@@ -4,12 +4,15 @@
     document.getElementById("display-modal").addEventListener("click", function () {
         $('#modal-add-player').modal("show");
     });
+    //ya que es solamente remoto, no se hace verificacion
+    /*
     document.getElementById("checkLocal").addEventListener("change", function () {
         document.getElementById("checkRemote").checked = false;
     });
     document.getElementById("checkRemote").addEventListener("change", function () {
         document.getElementById("checkLocal").checked = false;
     });
+    */
     document.getElementById("Add-player").addEventListener("click", function () {
         addPlayer();
     });
@@ -61,6 +64,7 @@ var remotePlayersQ = 0;
 var alreadyVoteLocal = false;
 var roundStateLocal = 1;
 var votePhase;
+var localVote;
 
 //proposedGroup verify
 var verifyLocalSend = 0
@@ -682,60 +686,6 @@ function getGame() {
 
 //POST Authenticated
 function createGame() {
-    if ($('#checkLocal').prop('checked') || $('#checkRemote').prop('checked')) {
-        if ($('#checkLocal').prop('checked')) {
-            var ownerName = $('#ownerNameInput').val();
-            var gameName = $('#gameNameInput').val();
-            var gamePassword = $('#gamePassword').val();
-            gameOwner = ownerName;
-            gamePassw = gamePassword;
-            $.ajax({
-                url: endpoint + "/api/games/",
-                headers: { owner: ownerName, name: gameName },
-                type: 'POST',
-                data: JSON.stringify({ name: gameName, owner: ownerName, password: gamePassword }),
-                dataType: 'json',
-                contentType: 'application/json',
-                success: function (result) {
-                    $('#create-Game-Sect').hide();
-                    $('#participants-list').show();
-
-                    gameId = result.data.id;
-                    var html = "<li>" + ownerName + "</li>";
-                    $('#part-list').html(html);
-                    $('#ownerNameInput').val('');
-                    $('#gameNameInput').val('');
-                    $('#gamePassword').val('');
-
-                },
-
-                error: function (errorMessage) {
-                    alert("error");
-                    if (errorMessage.status == 400) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Client error',
-                            showConfirmButton: false,
-                            timer: 1800
-                        });
-
-                    }
-                    if (errorMessage.status == 409) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Asset already exists',
-                            showConfirmButton: false,
-                            timer: 1800
-                        });
-
-                    }
-
-                }
-            });
-
-        } else {
             var ownerName = $('#ownerNameInput').val();
             var gameName = $('#gameNameInput').val();
             var gamePassword = $('#gamePassword').val();
@@ -783,21 +733,8 @@ function createGame() {
                     }
                 }
             });
-
-
-
-        }
-
-    } else {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Debe seleccionar un checkbox ',
-            showConfirmButton: false,
-            timer: 1800
-        });
-    }
 }
+
 
 function rechargePartListLocal() {
     var gameInfo = getGame();
@@ -978,6 +915,10 @@ function startRemoteGame() {
             html += '<h5 id="' + gameOwner + 'waitStartGame">Esperando que la partida inicie</h5>';
             html += '</div>';
             html += '<div class="mb-1">';
+            html += '<div class="mb-1">';
+            html += '<h5 id="' + gameOwner + 'roundGroup"></h5>';
+            html += '</div>';
+            html += '<div class="mb-1">';
             html += '<button type="button" class="btn btn-success" id="' + gameOwner + 'acceptVoteLocal" onclick="return acceptGroupVoteLocal()" value="Aceptar"> Aceptar</button>';
             html += '</div>';
             html += '<div class="mb-1">';
@@ -987,10 +928,7 @@ function startRemoteGame() {
             //esperando votos
             html += '<h5 id="' + gameOwner + 'waitVote">Esperando los otros votos</h5>';
             html += '</div>';
-            html += '<div class="mb-1">';
-            html += '<h5 id="' + gameOwner + 'roundGroup"></h5>';
-            html += '</div>';
-            html += '<div class="mb-1">';
+           
             if (gameInfo.data.enemies.includes(gameOwner) == true) {
 
                 html += '<h5 id="' + gameOwner + 'selectPath">Seleccione el voto a favor o en contra</h5>';
@@ -1208,6 +1146,8 @@ function rechargeCard() {
 
     roundStateLocal = roundInfoLocal.length;
 
+
+
     if (roundInfoLocal.length != 0) {
         remoteRound = findRoundLocal(roundInfoLocal);
         //console.log("ronda" + JSON.stringify(roundInfoLocal[remoteRound]));
@@ -1251,6 +1191,7 @@ function rechargeCard() {
             $.each(roundInfoLocal[remoteRound].group, function (key, element) {
                 if (element == gameOwner) {
                     if (proposedGroupVerifyLocal == false) {
+                        $('#' + gameOwner + 'waitingPath').hide();
                         $('#' + gameOwner + 'sendPath').show();
                         $('#' + gameOwner + 'goodPath').show();
                         $('#' + gameOwner + 'selectPath').show();
@@ -1287,6 +1228,7 @@ function rechargeCard() {
             $('#' + gameOwner + 'waitVote').show();
         }
     }
+
     if (status == "ended") {
         clearcontent("card" + gameOwner);
         if (citizenScore == 3) {
@@ -1315,20 +1257,23 @@ function findScore(roundInfoLocal) {
             citizenScoreLocal = + 1;
         }
     }
-
+    
     // Obtén la etiqueta por su ID
     var enemieScoreL = document.getElementById("PsychoScore");
-
     // Actualiza el texto utilizando textContent
     enemieScoreL.textContent = enemieScore.toString();
 
 
-    var citizenScoreL = document.getElementById("ExeScore");
 
+    var citizenScoreL = document.getElementById("ExeScore");
     // Actualiza el texto utilizando textContent
     citizenScoreL.textContent = citizenScore.toString();
 
-
+    //Actualiza contador de Decada
+    // Obtén la etiqueta por su ID
+    var decadeCountL = document.getElementById("DecadeCount");
+    // Actualiza el texto utilizando textContent
+    decadeCountL.textContent = roundInfoLocal.length.toString();
 }
 
 function findRoundLocal(rounds) {
@@ -1337,17 +1282,17 @@ function findRoundLocal(rounds) {
             return i; // Retorna la posición del objeto con la clave buscada
         }
     }
-    return -1;
+    return rounds.length -1;
 }
 
 function sendLocalVote(playerName) {
     var localRound = findRound(roundInfoLocal);
-    if (LocalVote != null) {
+    if (localVote != null) {
         $.ajax({
             url: endpoint + "/api/games/" + gameId + "/rounds/" + roundInfoLocal[localRound].id,
             headers: { player: playerName, password: gamePassw },
             type: "POST",
-            data: JSON.stringify({ vote: LocalVote }),
+            data: JSON.stringify({ vote: localVote }),
             dataType: "json",
             contentType: "application/json",
             success: function (result) {
@@ -1687,8 +1632,8 @@ function rechargeGames() {
 }
 
 function acceptGroupVoteLocal() {
-    LocalVote = true;
+    localVote = true;
 }
 function deniedGroupVoteLocal() {
-    LocalVote = false;
+    localVote = false;
 }
