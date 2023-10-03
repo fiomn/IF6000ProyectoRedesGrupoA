@@ -7,17 +7,25 @@ var remoteRound = 0;
 
 var gameStatus = '';
 
-var verifySend = 0
+
 var cardCompleted = 0;
 //voting
 var alreadyVoteRemote = false;
 var roundState = 1;
 var votePhaseRemote;
-var roundInfo = [];
 var alreadyProposalRemote = false;
 
+//proposedGroup verify
+var verifySend = 0
+var proposedGroupVerifyRemote = false;
+var currentDecadeRemote = 0;
+
+//scores
 var enemieScore = 0;
 var citizenScore = 0;
+
+//array rounds
+var roundInfo = [];
 
 function getInfoGame() {
     return JSON.parse($.ajax({
@@ -335,12 +343,19 @@ function rechargeRemoteCard() {
         } else {
             $('#' + remoteNamePlayer + 'waitSelection').show();
         }
-        verifySend = 0;
     } 
 
 
     //el juego ha empezado
     if (gameStatus == "rounds") {
+
+        currentDecadeRemote = roundInfo.length;
+        if (currentDecadeRemote != verifySend) {
+            proposedGroupVerifyRemote = false;
+        }
+
+        verifySend = currentDecadeRemote;
+
         if (votePhaseRemote != null && votePhaseRemote != roundInfo[remoteRound].phase) {
             alreadyVoteRemote = false;
         }
@@ -366,7 +381,7 @@ function rechargeRemoteCard() {
             $.each(roundInfo[remoteRound].group, function (key, element) {
                 if (element == remoteNamePlayer) {
 
-                    if (verifySend == 0) { //element.psycho == false
+                    if (proposedGroupVerifyRemote == false) { //element.psycho == false
                         $('#' + remoteNamePlayer + 'waitingPath').hide();
                         $('#' + remoteNamePlayer + 'sendPath').show();
                         $('#' + remoteNamePlayer + 'goodPath').show();
@@ -412,12 +427,13 @@ function rechargeRemoteCard() {
 
 //encuentra puntuacion de cada bando
 function findScore(roundInfo) {
-   
+    enemieScore = 0;
+    citizenScore = 0;
     for (let i = 0; i < roundInfo.length; i++) {
         if (roundInfo[i].result == "enemies") {
-            enemieScore = + 1;
+            enemieScore += 1;
         } else if (roundInfo[i].result == "citizens") {
-            citizenScore = + 1;
+            citizenScore += 1;
         }
     }
 
@@ -554,7 +570,7 @@ function findRound(rounds) {
                 dataType: "json",
                 contentType: "application/json",
                 success: function (result) {
-                    verifySend = 1;
+                    proposedGroupVerifyRemote = true;
                     remotePath = null;
                     rechargeRemoteCard();
                 },

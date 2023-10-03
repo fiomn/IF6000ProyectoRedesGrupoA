@@ -42,7 +42,7 @@
 
 });
 var playerAmount;
-var endpoint;
+var endpoint = "https://contaminados.meseguercr.com";
 var localGameId;
 var gameId;
 var playerCount = 1;
@@ -56,18 +56,24 @@ var countSendPaths = 0;
 var psychoWin = 0;
 var psychoLost = 0;
 var remotePlayersQ = 0;
-var verifyLocalSend = 0
+
 //voting
 var alreadyVoteLocal = false;
 var roundStateLocal = 1;
 var votePhase;
 
+//proposedGroup verify
+var verifyLocalSend = 0
+var proposedGroupVerifyLocal = false;
+var currentDecadeLocal = 0;
+
 //scores
 var citizenScoreLocal = 0;
 var enemieScoreLocal = 0;
 
-var status;
+//array rounds
 var roundInfoLocal = [];
+var status;
 
 //function getEndPoint() {
 //    return endpoint;
@@ -753,6 +759,7 @@ function createGame() {
                     $('#create-Game-Sect').hide();
 
                 },
+
                 error: function (errorMessage) {
                     if (errorMessage.status == 400) {
                         Swal.fire({
@@ -764,9 +771,17 @@ function createGame() {
                         });
 
                     }
+                    if (errorMessage.status == 409) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Escoga otro nombre de juego',
+                            showConfirmButton: false,
+                            timer: 1800
+                        });
 
+                    }
                 }
-
             });
 
 
@@ -789,7 +804,6 @@ function rechargePartListLocal() {
     var html = '';
     $.each(gameInfo.data.players, function (key, element) {
         html += "<li>" + element + "</li>";
-
 
     });
     $('#remotePart-list').html(html);
@@ -1213,17 +1227,30 @@ function rechargeCard() {
         } else {
             $('#' + gameOwner + 'waitSelection').show();
         }
-        verifyLocalSend = 0;
     }
 
     //el juego ha empezado
     if (status == "rounds") {
 
+        currentDecadeLocal = roundInfoLocal.length;
+        if (currentDecadeLocal != verifyLocalSend) {
+            proposedGroupVerifyLocal = false;
+        }
+
+        verifyLocalSend = currentDecadeLocal;
+
+        if (votePhase != null && votePhase != roundInfoLocal[remoteRound].phase) {
+            alreadyVoteLocal = false;
+        }
+
+        votePhase = roundInfoLocal[remoteRound].phase;
+
+
         if (roundInfoLocal[remoteRound].status == "waiting-on-group") {
             //var rep = 0;
             $.each(roundInfoLocal[remoteRound].group, function (key, element) {
                 if (element == gameOwner) {
-                    if (true) {
+                    if (proposedGroupVerifyLocal == false) {
                         $('#' + gameOwner + 'sendPath').show();
                         $('#' + gameOwner + 'goodPath').show();
                         $('#' + gameOwner + 'selectPath').show();
@@ -1245,11 +1272,6 @@ function rechargeCard() {
 
             });
         }
-        if (votePhase != null && votePhase != roundInfoLocal[remoteRound].phase) {
-            alreadyVoteLocal = false;
-        }
-
-        votePhase = roundInfoLocal[remoteRound].phase;
 
         // ARREGLAR ACOMODO DE BOTONES CON INFO
         //mostrar votacion
@@ -1410,7 +1432,7 @@ function sendLocalPath(playerName) {
             contentType: "application/json",
             success: function (result) {
                 path = null;
-                verifyLocalSend = verifyLocalSend + 1;
+                proposedGroupVerifyLocal = true;
                 rechargeCard();
             },
             error: function (errorMessage) {
