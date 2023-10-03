@@ -22,7 +22,7 @@ var citizenScore = 0;
 function getInfoGame() {
     return JSON.parse($.ajax({
         type: 'GET',
-        url: endpoint + remoteGameId,
+        url: endpoint + "/api/games/" + remoteGameId,
         headers: { player: remoteNamePlayer, password: remoteGamePassword },
         dataType: 'json',
         global: false,
@@ -37,7 +37,7 @@ function getRoundGameRemote() {
     
     $.ajax({
         type: 'GET',
-        url: endpoint + remoteGameId + "/rounds",
+        url: endpoint + "/api/games/" + remoteGameId + "/rounds",
         headers: { player: remoteNamePlayer, password: remoteGamePassword },
         dataType: 'json',
         global: false,
@@ -61,7 +61,7 @@ function addPlayerRemote() {
     $('#user-name').val('');
     $.ajax({
 
-        url: endpoint + remoteGameId,
+        url: endpoint + "/api/games/" + remoteGameId,
         headers: { player: remoteNamePlayer, password: remoteGamePassword, },
         type: "PUT",
         data: JSON.stringify({ player: remoteNamePlayer }),
@@ -79,7 +79,7 @@ function addPlayerRemote() {
             html += '</div></div><div class="flex-md-column"><div class="container" id="path' + remoteNamePlayer + 'buttons">';
 
             html += '<div class="mb-1">';
-            html += '<h5 id="' + remoteNamePlayer + 'waitingPath">Esperando la selección de caminos de los jugadores escogidos</h5>';
+            html += '<h5 id="' + remoteNamePlayer + 'waitingPath">Esperando la votacion de los jugadores escogidos</h5>';
             html += '</div>';
             html += '<div class="mb-1">';
             html += '<h5 id="' + remoteNamePlayer + 'waitSelection">Esperando la selección del grupo de trabajo</h5>';
@@ -100,14 +100,14 @@ function addPlayerRemote() {
             html += '<h5 id="' + remoteNamePlayer + 'roundGroup"></h5>';
             html += '</div>';
             html += '<div class="mb-1">';
-            html += '<button type="button" class="btn btn-success" id="' + remoteNamePlayer + 'goodPath" onclick="goodRemotePath()" value="Camino Seguro"> Camino Seguro</button>';
+            html += '<button type="button" class="btn btn-success" id="' + remoteNamePlayer + 'goodPath" onclick="goodRemotePath()" value="Camino Seguro">Voto a favor</button>';
             html += '</div>';
 
             html += '</div></div></div>';
             html += '<div class="card-footer"> <div class="d-flex justify-content-center">';
             //submits
             html += '<button type="button" class="btn-outline-success" id="' + remoteNamePlayer + 'sendGroup"  onclick="sendRemoteGroup(\'' + remoteNamePlayer + '\')"> Enviar Grupo</button>';
-            html += '<button type="button" class="btn-outline-success" id="' + remoteNamePlayer + 'sendPath"  onclick="sendRemotePath(\'' + remoteNamePlayer + '\')"> Enviar Camino</button>';
+            html += '<button type="button" class="btn-outline-success" id="' + remoteNamePlayer + 'sendPath"  onclick="sendRemotePath(\'' + remoteNamePlayer + '\')"> Enviar voto</button>';
             html += '<button type="button" class="btn-outline-success" id="' + remoteNamePlayer + 'sendVote"  onclick="sendRemoteVote(\'' + remoteNamePlayer + '\')"> Enviar Voto</button>';
 
             html += '</div></div></div>';
@@ -205,7 +205,6 @@ function rechargePartList(gameInfo) {
         ol.appendChild(li);
 
     });
-    //$('#remotePart-list').html(html);
 
 }
 
@@ -213,7 +212,6 @@ function rechargeRemoteCard() {
     var gameInfo = getInfoGame();
     var psychoWins = 0;
     var psychosLost = 0;
-    //console.log("tamaño arreglo" + roundInfo.length);
     getRoundGameRemote();
 
     if (gameInfo.data.status == "rounds" || gameInfo.data.status == "leader") {
@@ -264,14 +262,14 @@ function rechargeRemoteCard() {
                 if (gameInfo.data.enemies.includes(remoteNamePlayer) == true) {
 
                     html1 += '<div class="mb-1">';
-                    html1 += '<button type="button" class="btn btn-danger" id="' + remoteNamePlayer + 'badPath" onclick="return badRemotePath()" value="Camino Inseguro"> Camino Inseguro</button>';
+                    html1 += '<button type="button" class="btn btn-danger" id="' + remoteNamePlayer + 'badPath" onclick="return badRemotePath()" value="Camino Inseguro">Sabotear</button>';
                     html1 += '</div>';
                     html1 += '<div class="mb-1">';
-                    html1 += '<h5 id="' + remoteNamePlayer + 'selectPath">Seleccione el camino seguro o inseguro</h5>';
+                    html1 += '<h5 id="' + remoteNamePlayer + 'selectPath">Seleccione el voto a favor o en contra</h5>';
                     html1 += '</div>';
                 } else {
                     html1 += '<div class="mb-1">';
-                    html1 += '<h5 id="' + remoteNamePlayer + 'selectPath">Seleccione el camino seguro</h5>';
+                    html1 += '<h5 id="' + remoteNamePlayer + 'selectPath">Seleccione el voto a favor</h5>';
                     html1 += '</div>';
                 }
                 html1 += '<div class="mb-1">';
@@ -305,17 +303,7 @@ function rechargeRemoteCard() {
         $('#' + remoteNamePlayer + 'badPath').hide();
     }
     $('#' + remoteNamePlayer + 'roundGroup').hide();
-    /*
-    if (gameInfo.psychoWin.length != 0) {
-        $.each(gameInfo.psychoWin, function (key, element) {
-            if (element == false) {
-                psychosLost = psychosLost + 1;
-            } else {
-                psychoWins = psychoWins + 1;
-            }
-
-        });
-    }*/
+  
     $('#PsychoScore').text(psychoWins);
     $('#ExeScore').text(psychosLost);
 
@@ -340,20 +328,6 @@ function rechargeRemoteCard() {
         rechargePartList(gameInfo);
     }
 
-    /*
-    if (roundInfo[remoteRound].status == "waiting-on-leader" && alreadyProposalRemote == false) {
-        if (roundInfo[remoteRound].leader == remoteNamePlayer) {
-            $('#player' + remoteNamePlayer + 'buttons').show();
-            $('#' + remoteNamePlayer + 'sendGroup').show();
-        } else {
-            $('#' + remoteNamePlayer + 'waitSelection').show();
-        }
-        verifySend = 0;
-    } else if (roundInfo[remoteRound].status == "waiting-on-leader" && alreadyProposalRemote == true) {
-        $('#' + remoteNamePlayer + 'waitSelection').show();
-    }
-    */
-
     if (roundInfo[remoteRound].status == "waiting-on-leader" ) {
         if (roundInfo[remoteRound].leader == remoteNamePlayer) {
             $('#player' + remoteNamePlayer + 'buttons').show();
@@ -367,8 +341,6 @@ function rechargeRemoteCard() {
 
     //el juego ha empezado
     if (gameStatus == "rounds") {
-        //var rep = 0;
-
         if (votePhaseRemote != null && votePhaseRemote != roundInfo[remoteRound].phase) {
             alreadyVoteRemote = false;
         }
@@ -420,19 +392,10 @@ function rechargeRemoteCard() {
     }
         if (gameStatus == "ended") {
             clearcontent("card" + remoteNamePlayer);
-            var countWin = 0;
-            /*
-            $.each(gameInfo.psychoWin, function (key, element) {
-                if (element == false) {
-                    countWin = countWin + 1;
-                }
-    
-            });
-            */
             if (citizenScore == 3) {
                 document.getElementById("card" + remoteNamePlayer).innerHTML = "<h4>El juego ha terminado, los ciudadanos ejemplares ganaron la partida</h4>";
             } else if (enemieScore == 3) {
-                document.getElementById("card" + remoteNamePlayer).innerHTML = "<h4>El juego ha terminado, los psicopatas ganaron la partida</h4>";
+                document.getElementById("card" + remoteNamePlayer).innerHTML = "<h4>El juego ha terminado, los enemigos ganaron la partida</h4>";
             }
             
             $.each(playersSelected, function (key, item) {
@@ -502,15 +465,13 @@ function findRound(rounds) {
         var remoteRound = findRound(roundInfo);
         if (remoteVote != null) {
             $.ajax({
-                url: endpoint + remoteGameId + "/rounds/" + roundInfo[remoteRound].id,
+                url: endpoint + "/api/games/" + remoteGameId + "/rounds/" + roundInfo[remoteRound].id,
                 headers: { player: playerName, password: remoteGamePassword },
                 type: "POST",
                 data: JSON.stringify({ vote: remoteVote }),
                 dataType: "json",
                 contentType: "application/json",
                 success: function (result) {
-                    //verifySend = 1;
-                    //remotePath = null;
                     alreadyVoteRemote = true;
                     rechargeRemoteCard();
                 },
@@ -583,11 +544,10 @@ function findRound(rounds) {
 
 
     function sendRemotePath(playerName) {
-        //console.log("antes:" + remote);
         var remoteRound = findRound(roundInfo);
         if (remotePath != null) {
             $.ajax({
-                url: endpoint + remoteGameId + "/rounds/" + roundInfo[remoteRound].id,
+                url: endpoint + "/api/games/" + remoteGameId + "/rounds/" + roundInfo[remoteRound].id,
                 headers: { player: playerName, password: remoteGamePassword },
                 type: "PUT",
                 data: JSON.stringify({ action: remotePath }),
@@ -720,7 +680,7 @@ function findRound(rounds) {
         });
 
         $.ajax({
-            url: endpoint + remoteGameId + "/rounds/" + gameInfo.data.currentRound,
+            url: endpoint + "/api/games/" + remoteGameId + "/rounds/" + gameInfo.data.currentRound,
             headers: { player: remoteNamePlayer, password: remoteGamePassword },
             type: "PATCH",
             data: JSON.stringify(playersGroup),

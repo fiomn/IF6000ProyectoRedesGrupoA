@@ -27,6 +27,7 @@
     });
     document.getElementById("btn-endpoint").addEventListener("click", function () {
         changeEndpoint();
+        $('#modalConfig').modal('hide');
     });
     document.getElementById("btn-RemoteGame").addEventListener("click", function () {
         showGamesTable();
@@ -41,7 +42,7 @@
 
 });
 var playerAmount;
-var endpoint = "https://contaminados.meseguercr.com/api/games/";
+var endpoint;
 var localGameId;
 var gameId;
 var playerCount = 1;
@@ -66,7 +67,7 @@ var citizenScoreLocal = 0;
 var enemieScoreLocal = 0;
 
 var status;
-var roundInfoLocalLocal = [];
+var roundInfoLocal = [];
 
 //function getEndPoint() {
 //    return endpoint;
@@ -74,7 +75,7 @@ var roundInfoLocalLocal = [];
 
 function startGame() {
 
-    var gameStart = gameId + "/start"
+    var gameStart = "/api/games/"+gameId + "/start"
     gamePassw = gamePassw;
     $.ajax({
         url: endpoint + gameStart,
@@ -117,7 +118,7 @@ function startGame() {
 
 
                 html += '<div class="mb-1">';
-                html += '<h5 id="' + item + 'waitingPath">Esperando la selección de caminos</h5>';
+                html += '<h5 id="' + item + 'waitingPath">Esperando el voto de los jugadores escogidos</h5>';
                 html += '</div>';
                 html += '<div class="mb-1">';
                 html += '<h5 id="' + item + 'waitSelection">Esperando la selección de grupos</h5>';
@@ -126,18 +127,18 @@ function startGame() {
                 html += '<h5 id="' + item + 'roundGroup"></h5>';
                 html += '</div>';
                 html += '<div class="mb-1">';
-                html += '<button type="button" class="btn-outline-success" id="' + item + 'goodPath" onclick="goodPath()" value="Camino Seguro"> Camino Seguro</button>';
+                html += '<button type="button" class="btn-outline-success" id="' + item + 'goodPath" onclick="goodPath()" value="Camino Seguro">Voto a favor</button>';
                 html += '</div>';
                 if (gameInfo.data.enemies.includes(item) == true) {
                     html += '<div class="mb-1">';
-                    html += '<button type="button" class="btn-outline-successy" id="' + item + 'badPath" onclick="return badPath()" value="Camino Inseguro"> Camino Inseguro</button>';
+                    html += '<button type="button" class="btn-outline-successy" id="' + item + 'badPath" onclick="return badPath()" value="Camino Inseguro">Sabotear</button>';
                     html += '</div>';
                 }
                 html += '</div></div></div>';
                 html += '<div class="card-footer"> <div class="d-flex justify-content-center">';
                 //submits
                 html += '<button type="button" class="btn-outline-success" id="' + item + 'sendGroup"  onclick="sendGroup(\'' + item + '\')"> Enviar Grupo</button>';
-                html += '<button type="button" class="btn-outline-success" id="' + item + 'sendPath"  onclick="sendPath(\'' + item + '\')"> Enviar Camino</button>';
+                html += '<button type="button" class="btn-outline-success" id="' + item + 'sendPath"  onclick="sendPath(\'' + item + '\')"> Enviar voto</button>';
 
                 html += '</div></div></div></div>';
 
@@ -290,7 +291,7 @@ function sendProposal(playerName) {
     })
 
     $.ajax({
-        url: endpoint + gameId + "/group",
+        url: endpoint + "/api/games" + gameId + "/group",
         headers: { name: playerName, password: gamePassw },
         type: "POST",
         data: JSON.stringify(playersGroup),
@@ -517,7 +518,7 @@ function groupSelected() {
 }
 function sendPath(playerName) {
     $.ajax({
-        url: endpoint + gameId + "/go",
+        url: endpoint + "/api/games" + gameId + "/go",
         headers: { name: playerName, password: gamePassw },
         type: "POST",
         data: JSON.stringify({ psycho: path }),
@@ -654,27 +655,13 @@ function sendPath(playerName) {
 
 }
 
-//GET public
-//function getGame() {
-//    return JSON.parse($.ajax({
-//        type: 'GET',
-//        url: endpoint,
-//        dataType: 'json',
-//        global: false,
-//        async: false,
-//        success: function (data) {
-//            return data;
-//        }
-//    }).responseText);
-//}
-
 
 //GET authenticated
 //trae un juego por ID (refresh)
 function getGame() {
     return JSON.parse($.ajax({
         type: 'GET',
-        url: endpoint + gameId,
+        url: endpoint + "/api/games/" + gameId,
         headers: { player: gameOwner, password: gamePassw },
         dataType: 'json',
         global: false,
@@ -685,79 +672,6 @@ function getGame() {
         }
     }).responseText);
 }
-
-//function addPlayer() {
-//    var gameJoin = gameId + "/join"
-//    var playerName = $('#player-name').val();
-//    var passwordGame = $('#password-game').val();
-//    //passwordGame = sha256(passwordGame);
-//    $.ajax({
-//        url: endpoint + gameJoin,
-//        headers: { name: playerName, password: passwordGame },
-//        type: "PUT",
-//        dataType: "json",
-//        contentType: "application/json",
-//        success: function (result) {
-//            var html = '';
-//            $.each(getGame().players, function (key, item) {
-//                html += "<li>" + item + "</li>";
-//            });
-//            $('#part-list').html(html);
-//            playerCount = playerCount + 1;
-//            $('#player-name').val('');
-//            $('#password-game').val('');
-
-
-//        },
-//        error: function (errorMessage) {
-//            if (errorMessage.status == 401) {
-//                Swal.fire({
-//                    icon: 'error',
-//                    title: 'Error',
-//                    text: 'Invalid credentials',
-//                    showConfirmButton: false,
-//                    timer: 1800
-//                });
-//            }
-//            if (errorMessage.status == 404) {
-//                Swal.fire({
-//                    icon: 'error',
-//                    title: 'Error',
-//                    text: 'The specified resource was not found',
-//                    showConfirmButton: false,
-//                    timer: 1800
-//                });
-//            }
-//            if (errorMessage.status == 409) {
-//                Swal.fire({
-//                    icon: 'error',
-//                    title: 'Error',
-//                    text: 'Asset already exists',
-//                    showConfirmButton: false,
-//                    timer: 1800
-//                });
-//            }
-//            if (errorMessage.status == 428) {
-//                Swal.fire({
-//                    icon: 'error',
-//                    title: 'Error',
-//                    text: 'This action is not allowed at this time',
-//                    showConfirmButton: false,
-//                    timer: 1800
-//                });
-//            }
-
-//        }
-//    });
-//    if (playerCount == 10) {
-//        document.getElementById("display-modal").disabled = true;
-//    }
-//    if (playerCount < 5) {
-//        document.getElementById("display-modal").disabled = false;
-//    }
-
-
-//}
 
 
 //POST Authenticated
@@ -770,7 +684,7 @@ function createGame() {
             gameOwner = ownerName;
             gamePassw = gamePassword;
             $.ajax({
-                url: endpoint,
+                url: endpoint + "/api/games/",
                 headers: { owner: ownerName, name: gameName },
                 type: 'POST',
                 data: JSON.stringify({ name: gameName, owner: ownerName, password: gamePassword }),
@@ -779,8 +693,6 @@ function createGame() {
                 success: function (result) {
                     $('#create-Game-Sect').hide();
                     $('#participants-list').show();
-                    //localRemoteGames
-                    //$("#display-modal").hide();
 
                     gameId = result.data.id;
                     var html = "<li>" + ownerName + "</li>";
@@ -824,17 +736,14 @@ function createGame() {
             gameOwner = ownerName;
             gamePassw = gamePassword;
             $.ajax({
-                url: endpoint,
+                url: endpoint + "/api/games/",
                 headers: { owner: ownerName, name: gameName },
                 type: "POST",
                 data: JSON.stringify({ name: gameName, owner: ownerName, password: gamePassword }),
                 dataType: "json",
                 contentType: "application/json",
                 success: function (result) {
-                    //console.log("funco");
                     $('#remoteParticipants-list').show();
-                    //localRemoteGames
-                    //$("#display-modal").hide();
                     gameId = result.data.id;
                     var html = "<li>" + ownerName + "</li>";
                     $('#remotePart-list').html(html);
@@ -846,7 +755,6 @@ function createGame() {
                 },
                 error: function (errorMessage) {
                     if (errorMessage.status == 400) {
-                        //console.log("")
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
@@ -880,15 +788,11 @@ function rechargePartListLocal() {
     var gameInfo = getGame();
     var html = '';
     $.each(gameInfo.data.players, function (key, element) {
-        //alert("jugadores" + element);
         html += "<li>" + element + "</li>";
 
 
     });
     $('#remotePart-list').html(html);
-
-
-
 }
 
 function changeEndpoint() {
@@ -911,7 +815,7 @@ function changeEndpoint() {
                 });
 
             }
-            endpoint = "https://contaminados.meseguercr.com/api/games/";
+            //endpoint = $('#direccion').val()+"/api/games";
 
         }
     });
@@ -934,7 +838,7 @@ function sendLocalProposal(playerName) {
     })
 
     $.ajax({
-        url: endpoint + gameId + "/rounds/" + gameInfo.data.currentRound,
+        url: endpoint + "/api/games/" + gameId + "/rounds/" + gameInfo.data.currentRound,
         headers: { player: gameOwner, password: gamePassw },
         type: "PATCH",
         data: JSON.stringify(playersGroup),
@@ -1008,7 +912,7 @@ function startRemoteGame() {
 
     $.ajax({
 
-        url: endpoint + gameStart,
+        url: endpoint + "/api/games/" + gameStart,
         headers: { password: gamePassw, player: gameOwner },
         type: "HEAD",
         dataType: "json",
@@ -1051,7 +955,7 @@ function startRemoteGame() {
 
 
             html += '<div class="mb-1">';
-            html += '<h5 id="' + gameOwner + 'waitingPath">Esperando la selección de caminos de los jugadores escogidos</h5>';
+            html += '<h5 id="' + gameOwner + 'waitingPath">Esperando el voto de los jugadores escogidos</h5>';
             html += '</div>';
             html += '<div class="mb-1">';
             html += '<h5 id="' + gameOwner + 'waitSelection">Esperando la selección del grupo de trabajo</h5>';
@@ -1075,25 +979,25 @@ function startRemoteGame() {
             html += '<div class="mb-1">';
             if (gameInfo.data.enemies.includes(gameOwner) == true) {
 
-                html += '<h5 id="' + gameOwner + 'selectPath">Seleccione el camino seguro o inseguro</h5>';
+                html += '<h5 id="' + gameOwner + 'selectPath">Seleccione el voto a favor o en contra</h5>';
 
             } else {
-                html += '<h5 id="' + gameOwner + 'selectPath">Seleccione el camino seguro</h5>';
+                html += '<h5 id="' + gameOwner + 'selectPath">Seleccione el voto a favor</h5>';
             }
             html += '</div>';
             html += '<div class="mb-1">';
-            html += '<button type="button" class="btn btn-success" id="' + gameOwner + 'goodPath" onclick="goodPath()" value="Camino Seguro"> Camino Seguro</button>';
+            html += '<button type="button" class="btn btn-success" id="' + gameOwner + 'goodPath" onclick="goodPath()" value="Camino Seguro">Voto a favor</button>';
             html += '</div>';
             if (gameInfo.data.enemies.includes(gameOwner) == true) {
                 html += '<div class="mb-1">';
-                html += '<button type="button" class="btn btn-danger" id="' + gameOwner + 'badPath" onclick="return badPath()" value="Camino Inseguro"> Camino Inseguro</button>';
+                html += '<button type="button" class="btn btn-danger" id="' + gameOwner + 'badPath" onclick="return badPath()" value="Camino Inseguro">Sabotear</button>';
                 html += '</div>';
             }
             html += '</div></div></div>';
             html += '<div class="card-footer"> <div class="d-flex justify-content-center">';
             //submits
             html += '<button type="button" class="btn-outline-success" id="' + gameOwner + 'sendGroup"  onclick="sendLocalGroup(\'' + gameOwner + '\')"> Enviar Grupo</button>';
-            html += '<button type="button" class="btn-outline-success" id="' + gameOwner + 'sendPath"  onclick="sendLocalPath(\'' + gameOwner + '\')"> Enviar Camino</button>';
+            html += '<button type="button" class="btn-outline-success" id="' + gameOwner + 'sendPath"  onclick="sendLocalPath(\'' + gameOwner + '\')"> Enviar Voto</button>';
             html += '<button type="button" class="btn-outline-success" id="' + gameOwner + 'sendVote"  onclick="sendLocalVote(\'' + gameOwner + '\')"> Enviar Voto</button>';
             html += '</div></div></div>';
 
@@ -1198,11 +1102,10 @@ function startRemoteGame() {
 }
 
 function getRoundGame() {
-    //console.log("entro");
     var roundId = gameId + "/rounds";
     $.ajax({
         type: 'GET',
-        url: endpoint + roundId,
+        url: endpoint + "/api/games/" + roundId,
         headers: { player: gameOwner, password: gamePassw },
         dataType: 'json',
         global: false,
@@ -1238,14 +1141,11 @@ function rechargeCard() {
     var remoteRound = 0;
     var psychoWins = 0;
     var psychosLost = 0;
-    //console.log(gameId + " " + gameOwner + " " + gamePassw);
-
-    //  Me vale picha, esta mierda no servia fuera en un metodo, que se vaya a la mierda
 
     var roundId = gameId + "/rounds";
     $.ajax({
         type: 'GET',
-        url: endpoint + roundId,
+        url: endpoint + "/api/games/" + roundId,
         headers: { player: gameOwner, password: gamePassw },
         dataType: 'json',
         global: false,
@@ -1279,18 +1179,6 @@ function rechargeCard() {
         $('#' + gameOwner + 'badPath').hide();
     }
     $('#' + gameOwner + 'roundGroup').hide();
-    /*
-    if (gameInfo.psychoWin.length != 0) {
-        $.each(gameInfo.psychoWin, function (key, element) {
-            if (element == false) {
-                psychosLost = psychosLost + 1;
-            } else {
-                psychoWins = psychoWins + 1;
-            }
-
-        });
-    }
-    */
     $('#PsychoScore').text(psychoWins);
     $('#ExeScore').text(psychosLost);
 
@@ -1379,19 +1267,10 @@ function rechargeCard() {
     }
     if (status == "ended") {
         clearcontent("card" + gameOwner);
-        var countWin = 0;
-        /*
-        $.each(gameInfo.psychoWin, function (key, element) {
-            if (element == false) {
-                countWin = countWin + 1;
-            }
-
-        });
-         */
         if (citizenScore == 3) {
             document.getElementById("card" + gameOwner).innerHTML = "<h4>El juego ha terminado, los ciudadanos ejemplares ganaron la partida</h4>";
         } else if (enemieScore == 3) {
-            document.getElementById("card" + gameOwner).innerHTML = "<h4>El juego ha terminado, los psicopatas ganaron la partida</h4>";
+            document.getElementById("card" + gameOwner).innerHTML = "<h4>El juego ha terminado, los enemigos ganaron la partida</h4>";
         }
 
         $.each(playersSelected, function (key, item) {
@@ -1443,15 +1322,13 @@ function sendLocalVote(playerName) {
     var localRound = findRound(roundInfoLocal);
     if (LocalVote != null) {
         $.ajax({
-            url: endpoint + gameId + "/rounds/" + roundInfoLocal[localRound].id,
+            url: endpoint + "/api/games/" + gameId + "/rounds/" + roundInfoLocal[localRound].id,
             headers: { player: playerName, password: gamePassw },
             type: "POST",
             data: JSON.stringify({ vote: LocalVote }),
             dataType: "json",
             contentType: "application/json",
             success: function (result) {
-                //verifySend = 1;
-                //remotePath = null;
                 alreadyVoteLocal = true;
                 rechargeCard();
             },
@@ -1522,9 +1399,10 @@ function sendLocalVote(playerName) {
 }
 
 function sendLocalPath(playerName) {
+    var localRound = findRoundLocal(roundInfoLocal);
     if (path != null) {
         $.ajax({
-            url: endpoint + gameId + "/rounds/" + roundInfoLocal[roundInfo.length - 1].id,
+            url: endpoint + "/api/games/" + gameId + "/rounds/" + roundInfoLocal[localRound].id,
             headers: { player: playerName, password: gamePassw },
             type: "PUT",
             data: JSON.stringify({ action: path }),
@@ -1602,7 +1480,7 @@ function sendLocalPath(playerName) {
 }
 function proposedGroupInfo() {
     var info = "El grupo escogido fue: ";
-    var gameInfo = getGame();
+   // var gameInfo = getGame();
     var remoteRound = findRoundLocal(roundInfoLocal);
     $.each(roundInfoLocal[remoteRound].group, function (key, element) {
         if (key == (roundInfoLocal[remoteRound].group.length - 1)) {
@@ -1740,21 +1618,22 @@ function sendLocalGroup(playerName) {
 //GET publico
 function LoadGames(pageNumber) {
     $.ajax({
-        url: endpoint + "?page=" + (pageNumber),
+        url: endpoint + "/api/games/" + "?page=" + (pageNumber),
         type: "GET",
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         success: function (result) {
             var html = '';
             $.each(result.data, function (key, item) {
+                if (item.status == 'lobby') {
+                    html += '<tr>';
+                    html += '<td>' + item.id + '</td>';
+                    html += '<td>' + item.name + '</td>';
+                    html += '<td> <button class="btn btn-outline-success" id="display-JoinModal" onclick="modalJoin(\'' + item.id + '\')">Unirme</button></td>';
 
-                html += '<tr>';
-                html += '<td>' + item.id + '</td>';
-                html += '<td>' + item.name + '</td>';
-                html += '<td> <button class="btn btn-outline-success" id="display-JoinModal" onclick="modalJoin(\'' + item.id + '\')">Unirme</button></td>';
 
-
-                html += '</tr>';
+                    html += '</tr>';
+                }               
             });
 
             $('#gamesLobby-tboody').html(html);
