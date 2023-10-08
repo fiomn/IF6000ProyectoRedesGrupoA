@@ -51,7 +51,7 @@ function getRoundGameRemote() {
         global: false,
         async: false,
         success: function (resp) {
-            console.log(JSON.stringify(resp.data));
+            //console.log(JSON.stringify(resp.data));
             return roundInfo = resp.data;
         }
     }

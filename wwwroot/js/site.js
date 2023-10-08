@@ -1063,7 +1063,7 @@ function getRoundGame() {
         global: false,
         async: false,
         success: function (resp) {
-            console.log(JSON.stringify(resp.data));
+            //console.log(JSON.stringify(resp.data));
             return roundInfoLocalLocal = resp.data;
         },
         error: function (ex) {
@@ -1103,7 +1103,7 @@ function rechargeCard() {
         global: false,
         async: false,
         success: function (resp) {
-            console.log(JSON.stringify(resp.data));
+            //console.log(JSON.stringify(resp.data));
             roundInfoLocal = resp.data;
         },
         error: function (ex) {
@@ -1590,6 +1590,7 @@ function LoadGames(pageNumber) {
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         success: function (result) {
+            //console.log(JSON.stringify(result));
             var html = '';
             $.each(result.data, function (key, item) {
                 if (item.status == 'lobby') {
@@ -1603,8 +1604,15 @@ function LoadGames(pageNumber) {
                 }               
             });
 
-            $('#gamesLobby-tboody').html(html);
-            $('#gamesTable-Lobby').DataTable();
+            $('#gamesLobby-tboody').append(html); // Usa append en lugar de html para agregar más juegos a la tabla
+
+            // Si hay más páginas, carga la siguiente página recursivamente
+            if (result.data.length > 0) {
+                LoadGames(pageNumber + 1);
+            } else {
+                // No hay más páginas o data está vacío, inicializa el DataTable
+                $('#gamesTable-Lobby').DataTable();
+            }
         },
         error: function (errorMessage) {
             alert(errorMessage.responseText);
@@ -1622,13 +1630,13 @@ function modalJoin(id) {
 
 function showGamesTable() {
     $('#gamesLobbyTable').show();
-    LoadGames(1);
+    LoadGames(0);
     $('#localRemoteGames').hide();
 }
 
 //devuelve todos los juegos del servidor por page
 function rechargeGames() {
-    LoadGames(1);
+    LoadGames(0);
 }
 
 function acceptGroupVoteLocal() {
