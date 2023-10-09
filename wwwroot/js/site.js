@@ -48,6 +48,7 @@ var playerAmount;
 var endpoint = "https://contaminados.meseguercr.com";
 var localGameId;
 var gameId;
+var gameName;
 var playerCount = 1;
 var gameOwner;
 var gamePassw;
@@ -673,6 +674,22 @@ function getGame() {
         type: 'GET',
         url: endpoint + "/api/games/" + gameId,
         headers: { player: gameOwner, password: gamePassw },
+        dataType: 'json',
+        global: false,
+        async: false,
+        success: function (data) {
+
+            return data;
+        }
+    }).responseText);
+}
+
+//GET authenticated
+//busca juego por nombre
+function getGameByName(name) {
+    return JSON.parse($.ajax({
+        type: 'GET',
+        url: endpoint + "/api/games" + "?name=" + name +"&page=0&limit=50",
         dataType: 'json',
         global: false,
         async: false,
@@ -1597,7 +1614,7 @@ function LoadGames(pageNumber) {
                     html += '<tr>';
                     html += '<td>' + item.id + '</td>';
                     html += '<td>' + item.name + '</td>';
-                    html += '<td> <button class="btn btn-outline-success" id="display-JoinModal" onclick="modalJoin(\'' + item.id + '\')">Unirme</button></td>';
+                    html += '<td> <button class="btn btn-outline-success" id="display-JoinModal" onclick="modalJoin(\'' + item.id + '\');  modalJoinName(\'' + item.name + '\');">Unirme</button ></td > ';
 
 
                     html += '</tr>';
@@ -1627,7 +1644,11 @@ function modalJoin(id) {
     $('#modal-join-game').modal("show");
 
 }
+function modalJoinName(name) {
+    gameName = name;
+    remoteGameName = name;
 
+}
 function showGamesTable() {
     $('#gamesLobbyTable').show();
     LoadGames(0);
