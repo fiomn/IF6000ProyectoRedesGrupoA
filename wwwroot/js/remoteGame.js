@@ -80,7 +80,8 @@ function addPlayerRemote() {
             dataType: "json",
             contentType: "application/json",
             success: function (result) {
-
+                var enlace = document.getElementById("config");
+                enlace.style.visibility = "hidden"; // Oculta el elemento
                 $('#modal-join-game').modal("hide");
                 $('#gamesLobbyTable').hide();
                 var html = '';
@@ -381,7 +382,6 @@ function rechargeRemoteCard() {
 
     //el juego ha empezado
     if (gameStatus == "rounds") {
-
         currentDecadeRemote = roundInfo.length;
         if (currentDecadeRemote != verifySend) {
             proposedGroupVerifyRemote = false;

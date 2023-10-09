@@ -1,4 +1,4 @@
-﻿$(document).ready(function () {
+$(document).ready(function () {
     hide();
 
     document.getElementById("display-modal").addEventListener("click", function () {
@@ -727,6 +727,8 @@ function createGame() {
                 dataType: "json",
                 contentType: "application/json",
                 success: function (result) {
+                    var enlace = document.getElementById("config");
+                    enlace.style.visibility = "hidden"; // Oculta el elemento
                     $('#remoteParticipants-list').show();
                     gameId = result.data.id;
                     var html = "<li>" + ownerName + "</li>";
@@ -782,6 +784,13 @@ function changeEndpoint() {
         dataType: "json",
         success: function (result) {
             $('#direccion').val('');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'El endpoint suministrado no es válido',
+                showConfirmButton: false,
+                timer: 1800
+            });
         },
         error: function (errorMessage) {
             if (errorMessage.status == 404) {
@@ -897,6 +906,7 @@ function startRemoteGame() {
         dataType: "json",
         contentType: "application/json",
         success: function (result) {
+            
             $('#remoteParticipants-list').hide();
             var gameInfo = getGame();
             var count = 0;
