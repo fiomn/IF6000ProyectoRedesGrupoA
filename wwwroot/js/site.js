@@ -25,8 +25,19 @@
     });
 
     document.getElementById("localGame-btn").addEventListener("click", function () {
-        $('#create-Game-Sect').show();
-        $('#localRemoteGames').hide();
+        if (endpoint != null) {
+            $('#create-Game-Sect').show();
+            $('#localRemoteGames').hide();
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Necesario conectarse a un servidor',
+                showConfirmButton: false,
+                timer: 1800
+            });
+        }
+        
     });
     document.getElementById("btn-endpoint").addEventListener("click", function () {
         changeEndpoint();
@@ -1650,9 +1661,20 @@ function modalJoinName(name) {
 
 }
 function showGamesTable() {
-    $('#gamesLobbyTable').show();
-    LoadGames(0);
-    $('#localRemoteGames').hide();
+    if (endpoint != null) {
+        $('#gamesLobbyTable').show();
+        LoadGames(0);
+        $('#localRemoteGames').hide();
+    } else {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Necesario conectarse a un servidor',
+            showConfirmButton: false,
+            timer: 1800
+        });
+    }
+    
 }
 
 //devuelve todos los juegos del servidor por page
