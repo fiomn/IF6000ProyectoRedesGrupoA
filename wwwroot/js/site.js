@@ -45,7 +45,7 @@
 
 });
 var playerAmount;
-var endpoint = "https://contaminados.meseguercr.com";
+var endpoint;
 var localGameId;
 var gameId;
 var gameName;
