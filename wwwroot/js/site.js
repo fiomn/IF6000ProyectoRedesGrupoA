@@ -40,8 +40,19 @@ $(document).ready(function () {
         
     });
     document.getElementById("btn-endpoint").addEventListener("click", function () {
-        changeEndpoint();
-        $('#modalConfig').modal('hide');
+        var aux = $('#direccion').val();
+        if (aux == null || aux == "") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'URL no puede estar vacia',
+                showConfirmButton: false,
+                timer: 1800
+            });
+        } else {
+            changeEndpoint();
+            $('#modalConfig').modal('hide');
+        }
     });
     document.getElementById("btn-RemoteGame").addEventListener("click", function () {
         showGamesTable();
@@ -243,7 +254,7 @@ function startGame() {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Need 5 players to start',
+                    text: 'Need at least 5 players to start',
                     showConfirmButton: false,
                     timer: 1800
                 });
@@ -681,18 +692,35 @@ function sendPath(playerName) {
 //GET authenticated
 //trae un juego por ID (refresh)
 function getGame() {
-    return JSON.parse($.ajax({
-        type: 'GET',
-        url: endpoint + "/api/games/" + gameId,
-        headers: { player: gameOwner, password: gamePassw },
-        dataType: 'json',
-        global: false,
-        async: false,
-        success: function (data) {
 
-            return data;
-        }
-    }).responseText);
+    if (gamePassw == "" || gamePassw == null) {
+        return JSON.parse($.ajax({
+            type: 'GET',
+            url: endpoint + "/api/games/" + gameId,
+            headers: { player: gameOwner},
+            dataType: 'json',
+            global: false,
+            async: false,
+            success: function (data) {
+
+                return data;
+            }
+        }).responseText);
+    } else if (gamePassw != "" && gamePassw != null) {
+        return JSON.parse($.ajax({
+            type: 'GET',
+            url: endpoint + "/api/games/" + gameId,
+            headers: { player: gameOwner, password: gamePassw },
+            dataType: 'json',
+            global: false,
+            async: false,
+            success: function (data) {
+
+                return data;
+            }
+        }).responseText);
+    }
+    
 }
 
 //GET authenticated
@@ -714,55 +742,104 @@ function getGameByName(name) {
 
 //POST Authenticated
 function createGame() {
-            var ownerName = $('#ownerNameInput').val();
-            var gameName = $('#gameNameInput').val();
-            var gamePassword = $('#gamePassword').val();
-            gameOwner = ownerName;
-            gamePassw = gamePassword;
-            $.ajax({
-                url: endpoint + "/api/games/",
-                headers: { owner: ownerName, name: gameName },
-                type: "POST",
-                data: JSON.stringify({ name: gameName, owner: ownerName, password: gamePassword }),
-                dataType: "json",
-                contentType: "application/json",
-                success: function (result) {
-                    var enlace = document.getElementById("config");
-                    enlace.style.visibility = "hidden"; // Oculta el elemento
-                    $('#remoteParticipants-list').show();
-                    gameId = result.data.id;
-                    var html = "<li>" + ownerName + "</li>";
-                    $('#remotePart-list').html(html);
-                    $('#ownerNameInput').val('');
-                    $('#gameNameInput').val('');
-                    $('#gamePassword').val('');
-                    $('#create-Game-Sect').hide();
+    var ownerName = $('#ownerNameInput').val();
+    var gameName = $('#gameNameInput').val();
+    var gamePassword = $('#gamePassword').val();
+    gameOwner = ownerName;
+    gamePassw = gamePassword;
+        
+    if (gamePassw == "" || gamePassw == null) {
+        $.ajax({
+            url: endpoint + "/api/games/",
+            headers: { owner: ownerName, name: gameName },
+            type: "POST",
+            data: JSON.stringify({ name: gameName, owner: ownerName}),
+            dataType: "json",
+            contentType: "application/json",
+            success: function (result) {
+                var enlace = document.getElementById("config");
+                enlace.style.visibility = "hidden"; // Oculta el elemento
+                $('#remoteParticipants-list').show();
+                gameId = result.data.id;
+                var html = "<li>" + ownerName + "</li>";
+                $('#remotePart-list').html(html);
+                $('#ownerNameInput').val('');
+                $('#gameNameInput').val('');
+                $('#gamePassword').val('');
+                $('#create-Game-Sect').hide();
 
-                },
+            },
 
-                error: function (errorMessage) {
-                    if (errorMessage.status == 400) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Client error',
-                            showConfirmButton: false,
-                            timer: 1800
-                        });
+            error: function (errorMessage) {
+                if (errorMessage.status == 400) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Client error',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
 
-                    }
-                    if (errorMessage.status == 409) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Escoga otro nombre de juego',
-                            showConfirmButton: false,
-                            timer: 1800
-                        });
-
-                    }
                 }
-            });
+                if (errorMessage.status == 409) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Escoga otro nombre de juego',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+
+                }
+            }
+        });
+    } else if(gamePassw != "" && gamePassw != null) {
+        $.ajax({
+            url: endpoint + "/api/games/",
+            headers: { owner: ownerName, name: gameName },
+            type: "POST",
+            data: JSON.stringify({ name: gameName, owner: ownerName, password: gamePassword }),
+            dataType: "json",
+            contentType: "application/json",
+            success: function (result) {
+                var enlace = document.getElementById("config");
+                enlace.style.visibility = "hidden"; // Oculta el elemento
+                $('#remoteParticipants-list').show();
+                gameId = result.data.id;
+                var html = "<li>" + ownerName + "</li>";
+                $('#remotePart-list').html(html);
+                $('#ownerNameInput').val('');
+                $('#gameNameInput').val('');
+                $('#gamePassword').val('');
+                $('#create-Game-Sect').hide();
+
+            },
+
+            error: function (errorMessage) {
+                if (errorMessage.status == 400) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Client error',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+
+                }
+                if (errorMessage.status == 409) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Escoga otro nombre de juego',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+
+                }
+            }
+        });
+    }
+            
 }
 
 
@@ -825,9 +902,13 @@ function sendLocalProposal(playerName) {
         proposedGroup = arrayRemove(proposedGroup, item);
     })
 
+    var headers = { player: gameOwner };
+    if (gamePassw != null && gamePassw != "") {
+        headers.password = gamePassw;
+    }
     $.ajax({
         url: endpoint + "/api/games/" + gameId + "/rounds/" + gameInfo.data.currentRound,
-        headers: { player: gameOwner, password: gamePassw },
+        headers: headers,
         type: "PATCH",
         data: JSON.stringify(playersGroup),
         dataType: "json",
@@ -894,14 +975,13 @@ function sendLocalProposal(playerName) {
 
 //este es el metodo usado para iniciar el juego y generar elementos en el juego
 function startRemoteGame() {
-    var psychoWins = 0;
-    var psychosLost = 0;
     var gameStart = gameId + "/start"
 
-    $.ajax({
+    if (gamePassw == "" || gamePassw == null) {
+        $.ajax({
 
         url: endpoint + "/api/games/" + gameStart,
-        headers: { password: gamePassw, player: gameOwner },
+        headers: { player: gameOwner },
         type: "HEAD",
         dataType: "json",
         contentType: "application/json",
@@ -993,8 +1073,6 @@ function startRemoteGame() {
 
             $('#row-remoteCardGame').html(html);
             $('#row-remoteCardGame').show();
-            $('#PsychoScore').text(psychoWins);
-            $('#ExeScore').text(psychosLost);
             $('#game-score').show();
             $('#remoteCard').removeClass('card');
 
@@ -1031,7 +1109,7 @@ function startRemoteGame() {
 
             }
             document.getElementById("h3" + gameOwner).style.color = "white";
-
+            rechargeCard();
         },
         error: function (errorMessage) {
             if (errorMessage.status == 401) {
@@ -1087,16 +1165,215 @@ function startRemoteGame() {
 
         }
     });
+    } else if (gamePassw != "" && gamePassw != null) {
+        $.ajax({
+
+            url: endpoint + "/api/games/" + gameStart,
+            headers: { password: gamePassw, player: gameOwner },
+            type: "HEAD",
+            dataType: "json",
+            contentType: "application/json",
+            success: function (result) {
+
+                $('#remoteParticipants-list').hide();
+                var gameInfo = getGame();
+                var count = 0;
+                var html = '';
+                html += '<div class="card" style="width:400px"> <div class="card-header" id="cardHead">';
+                html += '<div class="d-flex justify-content-end" style="height:32px;"><button type="button" class="btn-icon" onclick="rechargeCard()"><svg xmlns = "http://www.w3.org/2000/svg" width = "16" height = "16" fill = "currentColor" class="bi bi-arrow-clockwise" viewBox = "0 0 16 16" ><path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"></path><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"></path></svg ></button ></div ><div class="d-flex justify-content-center"> <h3 id="h3' + gameOwner + '" value="' + gameOwner + '">' + gameOwner + '</h3> </div></div>';
+                html += '<div class="card-body" id="card' + gameOwner + '"> <div class="flex-md-column"> <div class="container" id="player' + gameOwner + 'buttons"> ';
+                $.each(gameInfo.data.players, function (key, element) {
+                    if (gameInfo.data.enemies.includes(gameOwner) == true) {
+
+                        if (gameInfo.data.enemies.includes(element) == true) {
+                            html += '<div class="mb-1">';
+                            html += '<button type="button" class="btn-player" id="btn' + gameOwner + count + '" value="' + element + '" onclick="return getPlayer(\'' + element + '\',\'' + count + '\',\'' + gameOwner + '\')" style="color:red;width:100px">' + element + '</button>';
+                            html += '</div>';
+                            count = count + 1;
+
+                        } else {
+                            html += '<div class="mb-1">';
+                            html += '<button type="button" class="btn-player" id="btn' + gameOwner + count + '" value="' + element + '" onclick="return getPlayer(\'' + element + '\',\'' + count + '\',\'' + gameOwner + '\')" style="color:green;width:100px">' + element + '</button>';
+                            html += '</div>';
+                            count = count + 1;
+                        }
+
+                    } else {
+                        html += '<div class="mb-1">';
+                        html += '<button type="button" class="btn-player" id="btn' + gameOwner + count + '" value="' + element + '" onclick="return getPlayer(\'' + element + '\',\'' + count + '\',\'' + gameOwner + '\')" style="width:100px;">' + element + '</button>';
+                        html += '</div>';
+                        count = count + 1;
+                    }
+
+                });
+
+
+                html += '</div></div><div class="flex-md-column"><div class="container" id="path' + gameOwner + 'buttons">';
+
+
+                html += '<div class="mb-1">';
+                html += '<h5 id="' + gameOwner + 'waitingPath">Esperando el voto de los jugadores escogidos</h5>';
+                html += '</div>';
+                html += '<div class="mb-1">';
+                html += '<h5 id="' + gameOwner + 'waitSelection">Esperando la selección del grupo de trabajo</h5>';
+                html += '</div>';
+                html += '<div class="mb-1">';
+                html += '<h5 id="' + gameOwner + 'waitStartGame">Esperando que la partida inicie</h5>';
+                html += '</div>';
+                html += '<div class="mb-1">';
+                html += '<div class="mb-1">';
+                html += '<h5 id="' + gameOwner + 'roundGroup"></h5>';
+                html += '</div>';
+                html += '<div class="mb-1">';
+                html += '<button type="button" class="btn btn-success" id="' + gameOwner + 'acceptVoteLocal" onclick="return acceptGroupVoteLocal()" value="Aceptar"> Aceptar</button>';
+                html += '</div>';
+                html += '<div class="mb-1">';
+                html += '<button type="button" class="btn btn-danger" id="' + gameOwner + 'deniedVoteLocal" onclick="return deniedGroupVoteLocal()" value="No aceptar"> No aceptar</button>';
+                html += '</div>';
+                html += '<div class="mb-1">';
+                //esperando votos
+                html += '<h5 id="' + gameOwner + 'waitVote">Esperando los otros votos</h5>';
+                html += '</div>';
+
+                if (gameInfo.data.enemies.includes(gameOwner) == true) {
+
+                    html += '<h5 id="' + gameOwner + 'selectPath">Seleccione el voto a favor o en contra</h5>';
+
+                } else {
+                    html += '<h5 id="' + gameOwner + 'selectPath">Seleccione el voto a favor</h5>';
+                }
+                html += '</div>';
+                html += '<div class="mb-1">';
+                html += '<button type="button" class="btn btn-success" id="' + gameOwner + 'goodPath" onclick="goodPath()" value="Camino Seguro">Voto a favor</button>';
+                html += '</div>';
+                if (gameInfo.data.enemies.includes(gameOwner) == true) {
+                    html += '<div class="mb-1">';
+                    html += '<button type="button" class="btn btn-danger" id="' + gameOwner + 'badPath" onclick="return badPath()" value="Camino Inseguro">Sabotear</button>';
+                    html += '</div>';
+                }
+                html += '</div></div></div>';
+                html += '<div class="card-footer"> <div class="d-flex justify-content-center">';
+                //submits
+                html += '<button type="button" class="btn-outline-success" id="' + gameOwner + 'sendGroup"  onclick="sendLocalGroup(\'' + gameOwner + '\')"> Enviar Grupo</button>';
+                html += '<button type="button" class="btn-outline-success" id="' + gameOwner + 'sendPath"  onclick="sendLocalPath(\'' + gameOwner + '\')"> Enviar Voto</button>';
+                html += '<button type="button" class="btn-outline-success" id="' + gameOwner + 'sendVote"  onclick="sendLocalVote(\'' + gameOwner + '\')"> Enviar Voto</button>';
+                html += '</div></div></div>';
+
+                $('#row-remoteCardGame').html(html);
+                $('#row-remoteCardGame').show();
+                $('#PsychoScore').text(psychoWins);
+                $('#ExeScore').text(psychosLost);
+                $('#game-score').show();
+                $('#remoteCard').removeClass('card');
+
+
+                //hiding vote buttons
+                $('#' + gameOwner + 'acceptVoteLocal').hide();
+                $('#' + gameOwner + 'deniedVoteLocal').hide();
+
+
+                $('#player' + gameOwner + 'buttons').hide();
+                //hiding submits
+                $('#' + gameOwner + 'sendPath').hide();
+                $('#' + gameOwner + 'sendGroup').hide();
+                $('#' + gameOwner + 'sendVote').hide();
+                $('#' + gameOwner + 'waitingPath').hide();
+                $('#' + gameOwner + 'waitSelection').hide();
+                $('#' + gameOwner + 'waitStartGame').hide();
+                $('#' + gameOwner + 'waitVote').hide();
+                $('#' + gameOwner + 'goodPath').hide();
+                $('#' + gameOwner + 'selectPath').hide();
+                if (gameInfo.data.enemies.includes(gameOwner) == true) {
+                    $('#' + gameOwner + 'badPath').hide();
+                }
+                $('#' + gameOwner + 'roundGroup').hide();
+                $('#remoteCard').removeClass('card');
+                if (gameInfo.data.enemies.includes(gameOwner) == true) {
+                    $('#remoteCard').addClass('card border-danger');
+                    document.getElementById('cardHead').style.background = "#ca1010";
+
+
+                } else {
+                    $('#remoteCard').addClass('card border-success');
+                    document.getElementById('cardHead').style.background = "#11b422";
+
+                }
+                document.getElementById("h3" + gameOwner).style.color = "white";
+
+            },
+            error: function (errorMessage) {
+                if (errorMessage.status == 401) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Unauthorized',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+
+                }
+                if (errorMessage.status == 403) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Forbidden',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+
+                }
+                if (errorMessage.status == 404) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Game not found',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+
+                }
+                if (errorMessage.status == 409) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Game already started',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+
+                }
+                if (errorMessage.status == 428) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Need 5 players to start',
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+
+                }
+
+            }
+        });
+    }
+
+   
 
 
 }
 
 function getRoundGame() {
     var roundId = gameId + "/rounds";
+
+    var headers = { player: gameOwner };
+    if (gamePassw != null && gamePassw != "") {
+        headers.password = gamePassw;
+    }
+
     $.ajax({
         type: 'GET',
         url: endpoint + "/api/games/" + roundId,
-        headers: { player: gameOwner, password: gamePassw },
+        headers: headers,
         dataType: 'json',
         global: false,
         async: false,
@@ -1133,10 +1410,16 @@ function rechargeCard() {
     var psychosLost = 0;
 
     var roundId = gameId + "/rounds";
+
+    var headers = { player: gameOwner };
+    if (gamePassw != null && gamePassw != "") {
+        headers.password = gamePassw;
+    }
+
     $.ajax({
         type: 'GET',
         url: endpoint + "/api/games/" + roundId,
-        headers: { player: gameOwner, password: gamePassw },
+        headers: headers,
         dataType: 'json',
         global: false,
         async: false,
@@ -1325,10 +1608,14 @@ function findRoundLocal(rounds) {
 
 function sendLocalVote(playerName) {
     var localRound = findRound(roundInfoLocal);
+    var headers = { player: gameOwner };
+    if (gamePassw != null && gamePassw != "") {
+        headers.password = gamePassw;
+    }
     if (localVote != null) {
         $.ajax({
             url: endpoint + "/api/games/" + gameId + "/rounds/" + roundInfoLocal[localRound].id,
-            headers: { player: playerName, password: gamePassw },
+            headers: headers,
             type: "POST",
             data: JSON.stringify({ vote: localVote }),
             dataType: "json",
@@ -1405,10 +1692,13 @@ function sendLocalVote(playerName) {
 
 function sendLocalPath(playerName) {
     var localRound = findRoundLocal(roundInfoLocal);
+    if (gamePassw != null && gamePassw != "") {
+        headers.password = gamePassw;
+    }
     if (path != null) {
         $.ajax({
             url: endpoint + "/api/games/" + gameId + "/rounds/" + roundInfoLocal[localRound].id,
-            headers: { player: playerName, password: gamePassw },
+            headers: headers,
             type: "PUT",
             data: JSON.stringify({ action: path }),
             dataType: "json",
