@@ -83,6 +83,10 @@ var psychoWin = 0;
 var psychoLost = 0;
 var remotePlayersQ = 0;
 
+//table
+var isTableCleared = false;
+var currentPage = 1; 
+
 //voting
 var alreadyVoteLocal = false;
 var roundStateLocal = 1;
@@ -1912,6 +1916,14 @@ function sendLocalGroup(playerName) {
 
 //GET publico
 function LoadGames(pageNumber) {
+    var $gamesTbody = $('#gamesLobby-tboody');
+
+    if (isTableCleared == false) {
+        // Borra los elementos de la tabla solo la primera vez que se llama
+        $gamesTbody.empty();
+        isTableCleared = true;
+    }
+
     $.ajax({
         url: endpoint + "/api/games/" + "?page=" + (pageNumber),
         type: "GET",
@@ -1939,6 +1951,11 @@ function LoadGames(pageNumber) {
                 LoadGames(pageNumber + 1);
             } else {
                 // No hay más páginas o data está vacío, inicializa el DataTable
+                isTableCleared = false;
+                var gamesTable = $('#gamesTable-Lobby').DataTable();
+                if (gamesTable) {
+                    gamesTable.destroy();
+                }
                 $('#gamesTable-Lobby').DataTable();
             }
         },
@@ -1961,7 +1978,7 @@ function modalJoinName(name) {
 
 }
 function showGamesTable() {
-    if (endpoint != null) {
+    if (endpoint != null || endpoint == "") {
         $('#gamesLobbyTable').show();
         LoadGames(0);
         $('#localRemoteGames').hide();
