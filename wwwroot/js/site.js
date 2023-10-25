@@ -1265,8 +1265,8 @@ function startRemoteGame() {
 
                 $('#row-remoteCardGame').html(html);
                 $('#row-remoteCardGame').show();
-                $('#PsychoScore').text(psychoWins);
-                $('#ExeScore').text(psychosLost);
+                $('#PsychoScore').text("0");
+                $('#ExeScore').text("0");
                 $('#game-score').show();
                 $('#remoteCard').removeClass('card');
 
@@ -1696,6 +1696,7 @@ function sendLocalVote(playerName) {
 
 function sendLocalPath(playerName) {
     var localRound = findRoundLocal(roundInfoLocal);
+    var headers = { player: gameOwner };
     if (gamePassw != null && gamePassw != "") {
         headers.password = gamePassw;
     }
@@ -1925,7 +1926,7 @@ function LoadGames(pageNumber) {
     }
 
     $.ajax({
-        url: endpoint + "/api/games/" + "?page=" + (pageNumber),
+        url: endpoint + "/api/games/" + "?status=lobby&page=" + (pageNumber),
         type: "GET",
         contentType: "application/json;charset=utf-8",
         dataType: "json",
@@ -1933,15 +1934,15 @@ function LoadGames(pageNumber) {
             //console.log(JSON.stringify(result));
             var html = '';
             $.each(result.data, function (key, item) {
-                if (item.status == 'lobby') {
+                
                     html += '<tr>';
                     html += '<td>' + item.id + '</td>';
                     html += '<td>' + item.name + '</td>';
-                    html += '<td> <button class="btn btn-outline-success" id="display-JoinModal" onclick="modalJoin(\'' + item.id + '\');  modalJoinName(\'' + item.name + '\');">Unirme</button ></td > ';
+                html += '<td> <button class="btn btn-outline-success" id="display-JoinModal" onclick="modalJoin(\'' + item.id + '\', \'' + item.password + '\');  modalJoinName(\'' + item.name + '\');">Unirme</button ></td > ';
 
 
                     html += '</tr>';
-                }               
+                              
             });
 
             $('#gamesLobby-tboody').append(html); // Usa append en lugar de html para agregar más juegos a la tabla
@@ -1966,9 +1967,16 @@ function LoadGames(pageNumber) {
 
 }
 
-function modalJoin(id) {
+function modalJoin(id,pwd) {
     gameId = id;
     remoteGameId = id;
+    $('#pwd').show();
+    $('#input-pwd').show();
+    if (pwd == "false") {
+        $('#pwd').hide();
+        $('#input-pwd').hide();
+    }
+
     $('#modal-join-game').modal("show");
 
 }
