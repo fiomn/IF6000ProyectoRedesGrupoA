@@ -706,7 +706,7 @@ function getGame() {
             global: false,
             async: false,
             success: function (data) {
-
+                console.log(JSON.stringify(data));
                 return data;
             }
         }).responseText);
@@ -719,7 +719,7 @@ function getGame() {
             global: false,
             async: false,
             success: function (data) {
-
+                console.log(JSON.stringify(data));
                 return data;
             }
         }).responseText);
@@ -859,35 +859,35 @@ function rechargePartListLocal() {
 
 function changeEndpoint() {
     endpoint = $('#direccion').val();
-    $.ajax({
-        url: endpoint,
-        type: "GET",
-        dataType: "json",
-        success: function (result) {
-            $('#direccion').val('');
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'El endpoint suministrado no es válido',
-                showConfirmButton: false,
-                timer: 1800
-            });
-        },
-        error: function (errorMessage) {
-            if (errorMessage.status == 404) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'El endpoint suministrado no es válido',
-                    showConfirmButton: false,
-                    timer: 1800
-                });
+    //$.ajax({
+    //    url: endpoint,
+    //    type: "GET",
+    //    dataType: "json",
+    //    success: function (result) {
+    //        $('#direccion').val('');
+    //        Swal.fire({
+    //            icon: 'error',
+    //            title: 'Error',
+    //            text: 'El endpoint suministrado no es válido',
+    //            showConfirmButton: false,
+    //            timer: 1800
+    //        });
+    //    },
+    //    error: function (errorMessage) {
+    //        if (errorMessage.status == 404) {
+    //            Swal.fire({
+    //                icon: 'error',
+    //                title: 'Error',
+    //                text: 'El endpoint suministrado no es válido',
+    //                showConfirmButton: false,
+    //                timer: 1800
+    //            });
 
-            }
+    //        }
             //endpoint = $('#direccion').val()+"/api/games";
 
-        }
-    });
+        //}
+    //});
 }
 
 
@@ -1428,7 +1428,7 @@ function rechargeCard() {
         global: false,
         async: false,
         success: function (resp) {
-            //console.log(JSON.stringify(resp.data));
+            console.log(JSON.stringify(resp));
             roundInfoLocal = resp.data;
         },
         error: function (ex) {
@@ -1938,7 +1938,7 @@ function LoadGames(pageNumber) {
                     html += '<tr>';
                     html += '<td>' + item.id + '</td>';
                     html += '<td>' + item.name + '</td>';
-                html += '<td> <button class="btn btn-outline-success" id="display-JoinModal" onclick="modalJoin(\'' + item.id + '\', \'' + item.password + '\');  modalJoinName(\'' + item.name + '\');">Unirme</button ></td > ';
+                    html += '<td> <button class="btn btn-outline-success" id="display-JoinModal" onclick="modalJoin(\'' + item.id + '\', \'' + item.password + '\');  modalJoinName(\'' + item.name + '\');">Unirme</button ></td > ';
 
 
                     html += '</tr>';
@@ -1948,7 +1948,7 @@ function LoadGames(pageNumber) {
             $('#gamesLobby-tboody').append(html); // Usa append en lugar de html para agregar más juegos a la tabla
 
             // Si hay más páginas, carga la siguiente página recursivamente
-            if (result.data.length > 0) {
+            if (result.data.length > 10) {
                 LoadGames(pageNumber + 1);
             } else {
                 // No hay más páginas o data está vacío, inicializa el DataTable

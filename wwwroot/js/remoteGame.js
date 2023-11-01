@@ -79,14 +79,15 @@ function addPlayerRemote() {
     var psychosLost = 0;
 
     remoteNamePlayer = $('#user-name').val();
-    remoteGamePassword = $('#passwordRemoteGame').val();
-    $('#password-game').val('');
+    remoteGamePassword = $('#input-pwd').val();
+    $('#input-pwd').val('');
     $('#user-name').val('');
     var gameInfoAux = getGameByName(remoteGameName);
     var headers = { player: remoteNamePlayer };
+    console.log(remoteGamePassword);
 
-    if (remoteGamePassword != null && remoteGamePassword != "") {
-        headers.password = remoteGamePassword;
+    if (remoteGamePassword !== null && remoteGamePassword !== "") {
+        headers['password'] = remoteGamePassword;
     }
 
     if (gameInfoAux.data[0].players.length < 10) {
@@ -248,7 +249,8 @@ function rechargePartList(gameInfo) {
     //var gameInfo = getGame();
     var html = '';
     document.getElementById(remoteNamePlayer + "waitList").innerHTML = "";
-    var ol = document.getElementById( remoteNamePlayer + "waitList");
+    var ol = document.getElementById(remoteNamePlayer + "waitList");
+    //console.log(JSON.stringify(gameInfo));
     $.each(gameInfo.data.players, function (key, element) {
         //alert("jugadores" + element);
         //html += "<li>" + element + "</li>";
@@ -531,8 +533,8 @@ function findRound(rounds) {
     function sendRemoteVote(playerName) {
         var remoteRound = findRound(roundInfo);
         var headers = { player: playerName };
-        if (remoteGamePassword != null && remoteGamePassword != "") {
-            headers.password = remoteGamePassword;
+        if (remoteGamePassword !== null && remoteGamePassword !== "") {
+            headers['password'] = remoteGamePassword;
         }
         if (remoteVote != null) {
             $.ajax({
