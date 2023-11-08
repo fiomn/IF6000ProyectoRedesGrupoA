@@ -1931,7 +1931,7 @@ function LoadGames(pageNumber) {
         contentType: "application/json;charset=utf-8",
         dataType: "json",
         success: function (result) {
-            //console.log(JSON.stringify(result));
+            console.log(JSON.stringify(result.data));
             var html = '';
             $.each(result.data, function (key, item) {
                 
@@ -1940,7 +1940,6 @@ function LoadGames(pageNumber) {
                     html += '<td>' + item.name + '</td>';
                     html += '<td> <button class="btn btn-outline-success" id="display-JoinModal" onclick="modalJoin(\'' + item.id + '\', \'' + item.password + '\');  modalJoinName(\'' + item.name + '\');">Unirme</button ></td > ';
 
-
                     html += '</tr>';
                               
             });
@@ -1948,7 +1947,7 @@ function LoadGames(pageNumber) {
             $('#gamesLobby-tboody').append(html); // Usa append en lugar de html para agregar más juegos a la tabla
 
             // Si hay más páginas, carga la siguiente página recursivamente
-            if (result.data.length > 10) {
+            if (result.data.length > 0) {
                 LoadGames(pageNumber + 1);
             } else {
                 // No hay más páginas o data está vacío, inicializa el DataTable
