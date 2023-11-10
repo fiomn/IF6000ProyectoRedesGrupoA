@@ -221,20 +221,31 @@ function addPlayerRemote() {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'El juego ya comenzó o esta lleno ',
+                        text: 'Formato invalido ',
                         showConfirmButton: false,
                         timer: 1800
                     });
 
                 }
                 if (errorMessage.status == 409) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'El jugador ya es parte del juego',
-                        showConfirmButton: false,
-                        timer: 1800
-                    });
+
+                    if (errorMessage.msg == "The game is full") {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'El juego esta lleno',
+                            showConfirmButton: false,
+                            timer: 1800
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'El jugador ya es parte del juego',
+                            showConfirmButton: false,
+                            timer: 1800
+                        });
+                    }
 
                 }
 

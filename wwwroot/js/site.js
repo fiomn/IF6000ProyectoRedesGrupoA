@@ -1160,7 +1160,7 @@ function startRemoteGame() {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Need 5 players to start',
+                    text: 'Need minimum 5 players to start',
                     showConfirmButton: false,
                     timer: 1800
                 });
