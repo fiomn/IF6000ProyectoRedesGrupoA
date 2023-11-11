@@ -789,7 +789,7 @@ function createGame() {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Escoga otro nombre de juego',
+                        text: 'Elija otro nombre de juego',
                         showConfirmButton: false,
                         timer: 1800
                     });
@@ -824,7 +824,7 @@ function createGame() {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Client error',
+                        text: 'Nombre invalido',
                         showConfirmButton: false,
                         timer: 1800
                     });

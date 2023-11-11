@@ -197,16 +197,6 @@ function addPlayerRemote() {
                     });
 
                 }
-                if (errorMessage.status == 403) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'No eres parte de la lista de jugadores',
-                        showConfirmButton: false,
-                        timer: 1800
-                    });
-
-                }
                 if (errorMessage.status == 404) {
                     Swal.fire({
                         icon: 'error',
