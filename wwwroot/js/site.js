@@ -806,6 +806,7 @@ function createGame() {
             dataType: "json",
             contentType: "application/json",
             success: function (result) {
+                console.log("ENTRO");
                 var enlace = document.getElementById("config");
                 enlace.style.visibility = "hidden"; // Oculta el elemento
                 $('#remoteParticipants-list').show();
@@ -1303,7 +1304,7 @@ function startRemoteGame() {
 
                 }
                 document.getElementById("h3" + gameOwner).style.color = "white";
-
+                rechargeCard();
             },
             error: function (errorMessage) {
                 if (errorMessage.status == 401) {
@@ -1921,7 +1922,10 @@ function LoadGames(pageNumber) {
 
     if (isTableCleared == false) {
         // Borra los elementos de la tabla solo la primera vez que se llama
+        gamesTable = $('#gamesTable-Lobby').DataTable();
+        gamesTable.destroy();
         $gamesTbody.empty();
+        
         isTableCleared = true;
     }
 
@@ -1952,10 +1956,7 @@ function LoadGames(pageNumber) {
             } else {
                 // No hay más páginas o data está vacío, inicializa el DataTable
                 isTableCleared = false;
-                var gamesTable = $('#gamesTable-Lobby').DataTable();
-                if (gamesTable) {
-                    gamesTable.destroy();
-                }
+
                 $('#gamesTable-Lobby').DataTable();
             }
         },
